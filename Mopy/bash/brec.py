@@ -1143,27 +1143,8 @@ class MelFull0(MelString):
         MelString.__init__(self,'FULL','full')
 
 #------------------------------------------------------------------------------
-class MelModel(MelGroup):
-    """Represents a model record."""
-    typeSets = (
-        ('MODL','MODB','MODT'),
-        ('MOD2','MO2B','MO2T'),
-        ('MOD3','MO3B','MO3T'),
-        ('MOD4','MO4B','MO4T'),)
-
-    def __init__(self,attr='model',index=0):
-        """Initialize. Index is 0,2,3,4 for corresponding type id."""
-        types = self.__class__.typeSets[(0,index-1)[index>0]]
-        MelGroup.__init__(self,attr,
-            MelString(types[0],'modPath'),
-            MelStruct(types[1],'f','modb'), ### Bound Radius, Float
-            MelBase(types[2],'modt_p'),) ###Texture Files Hashes, Byte Array
-
-    def debug(self,on=True):
-        """Sets debug flag on self."""
-        for element in self.elements[:2]: element.debug(on)
-        return self
-
+# Hack for allowing record imports from parent games - set per game
+MelModel = None # type: type
 #------------------------------------------------------------------------------
 class MelOptStruct(MelStruct):
     """Represents an optional structure, where if values are null, is skipped."""

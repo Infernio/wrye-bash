@@ -21,24 +21,50 @@
 #  https://github.com/wrye-bash
 #
 # =============================================================================
-
-"""This module contains the skyrim record classes. Ripped from skyrim.py"""
+"""This module contains the skyrim record classes."""
+import itertools
 import re
 import struct
-import itertools
-from ...bolt import Flags, sio, DataDict, winNewLines, \
-    encode, struct_pack, struct_unpack
-from ...brec import MelRecord, MelStructs, \
-    MelObject, MelGroups, MelStruct, FID, MelGroup, MelString, \
-    MreLeveledListBase, MelSet, MelFid, MelNull, MelOptStruct, MelFids, \
-    MreHeaderBase, MelBase, MelUnicode, MelFidList, MelStructA, MreRecord, \
-    MreGmstBase, MelLString, MelCountedFidList, MelOptStructA, \
-    MelCountedFids, MelSortedFidList, MelStrings
-from ...bass import null1, null2, null3, null4
-from ... import bush
-from constants import allConditions, fid1Conditions, fid2Conditions, \
+
+from .constants import allConditions, fid1Conditions, fid2Conditions, \
     fid5Conditions
+from ... import brec
+from ... import bush
+from ...bass import null1, null2, null3, null4
+from ...bolt import Flags, sio, DataDict, winNewLines, encode, struct_pack, \
+    struct_unpack
+from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
+    FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
+    MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelFidList, \
+    MelStructA, MreRecord, MreGmstBase, MelLString, MelCountedFidList, \
+    MelOptStructA, MelCountedFids, MelSortedFidList, MelStrings
 from ...exception import BoltError, ModError, ModSizeError, StateError
+# Set MelModel in brec but only if unset, otherwise we are being imported from
+# skyrimse.records
+if brec.MelModel is None:
+    class _MelModel(brec.MelGroup):
+        """Represents a model record."""
+        # MODB and MODD are no longer used by TES5Edit
+        typeSets = {'MODL': ('MODL', 'MODT', 'MODS'),
+                    'MOD2': ('MOD2', 'MO2T', 'MO2S'),
+                    'MOD3': ('MOD3', 'MO3T', 'MO3S'),
+                    'MOD4': ('MOD4', 'MO4T', 'MO4S'),
+                    'MOD5': ('MOD5', 'MO5T', 'MO5S'),
+                    'DMDL': ('DMDL', 'DMDT', 'DMDS'), }
+
+        def __init__(self, attr='model', subType='MODL'):
+            """Initialize."""
+            types = self.__class__.typeSets[subType]
+            MelGroup.__init__(self, attr, MelString(types[0], 'modPath'),
+                              MelBase(types[1], 'modt_p'),
+                              MelMODS(types[2], 'alternateTextures'), )
+
+        def debug(self, on=True):
+            """Sets debug flag on self."""
+            for element in self.elements[:2]: element.debug(on)
+            return self
+    brec.MelModel = _MelModel
+from ...brec import MelModel
 
 from_iterable = itertools.chain.from_iterable
 
@@ -491,32 +517,6 @@ class MelMODS(MelBase):
         if data is not None:
             data = [(string,function(fid),index) for (string,fid,index) in record.__getattribute__(attr)]
             if save: record.__setattr__(attr,data)
-
-#------------------------------------------------------------------------------
-class MelModel(MelGroup):
-    """Represents a model record."""
-    # MODB and MODD are no longer used by TES5Edit
-    typeSets = {
-        'MODL': ('MODL','MODT','MODS'),
-        'MOD2': ('MOD2','MO2T','MO2S'),
-        'MOD3': ('MOD3','MO3T','MO3S'),
-        'MOD4': ('MOD4','MO4T','MO4S'),
-        'MOD5': ('MOD5','MO5T','MO5S'),
-        'DMDL': ('DMDL','DMDT','DMDS'),
-        }
-    def __init__(self, attr='model', subType='MODL'):
-        """Initialize."""
-        types = self.__class__.typeSets[subType]
-        MelGroup.__init__(self,attr,
-            MelString(types[0],'modPath'),
-            MelBase(types[1],'modt_p'),
-            MelMODS(types[2],'alternateTextures'),
-            )
-
-    def debug(self,on=True):
-        """Sets debug flag on self."""
-        for element in self.elements[:2]: element.debug(on)
-        return self
 
 #------------------------------------------------------------------------------
 class MelOwnership(MelGroup):

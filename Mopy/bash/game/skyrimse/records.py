@@ -21,9 +21,103 @@
 #  https://github.com/wrye-bash
 #
 # =============================================================================
+"""This module contains the skyrim SE record classes. The great majority are
+imported from skyrim, but only after setting MelModel to the SSE format."""
+from ... import brec
+from ...bass import null1, null2, null3, null4
+from ...bolt import Flags, struct_pack, encode
+from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
+    FID, MelString, MelSet, MelFid, MelOptStruct, MelFids, MelBase, MelGroup, \
+    MelStructA, MelLString, MelCountedFidList
+from ...exception import ModSizeError
+# Set brec.MelModel to the skyrimse one - do not import from skyrim.records yet
 
-"""This module contains the skyrim SE record classes imported from skyrim"""
-from ..skyrim.records import *
+class MelMODS(MelBase): # copy pasted from game.skyrim.records.MelMODS
+    """MODS/MO2S/etc/DMDS subrecord"""
+    def hasFids(self,formElements):
+        """Include self if has fids."""
+        formElements.add(self)
+
+    def setDefault(self,record):
+        """Sets default value for record instance."""
+        record.__setattr__(self.attr,None)
+
+    def loadData(self, record, ins, sub_type, size_, readId):
+        """Reads data from ins into record attribute."""
+        insUnpack = ins.unpack
+        count, = insUnpack('I',4,readId)
+        data = []
+        dataAppend = data.append
+        for x in xrange(count):
+            string = ins.readString32(readId)
+            fid = ins.unpackRef()
+            index, = ins.unpack('I',4,readId)
+            dataAppend((string,fid,index))
+        record.__setattr__(self.attr,data)
+
+    def dumpData(self,record,out):
+        """Dumps data from record to outstream."""
+        data = record.__getattribute__(self.attr)
+        if data is not None:
+            data = record.__getattribute__(self.attr)
+            outData = struct_pack('I', len(data))
+            for (string,fid,index) in data:
+                outData += struct_pack('I', len(string))
+                outData += encode(string)
+                outData += struct_pack('=2I', fid, index)
+            out.packSub(self.subType,outData)
+
+    def mapFids(self,record,function,save=False):
+        """Applies function to fids.  If save is true, then fid is set
+           to result of function."""
+        attr = self.attr
+        data = record.__getattribute__(attr)
+        if data is not None:
+            data = [(string,function(fid),index) for (string,fid,index) in record.__getattribute__(attr)]
+            if save: record.__setattr__(attr,data)
+
+if brec.MelModel is None:
+    class _MelModel(MelGroup):
+        """Represents a model record."""
+        # MODB and MODD are no longer used by TES5Edit
+        typeSets = {'MODL': ('MODL', 'MODT', 'MODS'),
+                    'MOD2': ('MOD2', 'MO2T', 'MO2S'),
+                    'MOD3': ('MOD3', 'MO3T', 'MO3S'),
+                    'MOD4': ('MOD4', 'MO4T', 'MO4S'),
+                    'MOD5': ('MOD5', 'MO5T', 'MO5S'),
+                    'DMDL': ('DMDL', 'DMDT', 'DMDS'),
+                    }
+
+        class MelModelHash(MelBase):
+            """textureHashes are not used for loose files. There is never a
+            Bashed Patch, 0.bas. The record will be read if
+            present but no defaults are set and the record will not be
+            written."""
+            def loadData(self, record, ins, sub_type, size_, readId):
+                MelBase.loadData(self, record, ins, sub_type, size_, readId)
+            def getSlotsUsed(self):
+                return ()
+            def setDefault(self, record): return
+            def dumpData(self, record, out): return
+
+        def __init__(self, attr='model', subType='MODL'):
+            """Initialize."""
+            types = self.__class__.typeSets[subType]
+            MelGroup.__init__(self, attr, MelString(types[0], 'modPath'),
+                                   self.__class__.MelModelHash(types[1],
+                                                               'textureHashes'),
+                                   MelMODS(types[2], 'alternateTextures'), )
+
+        def debug(self, on=True):
+            """Sets debug flag on self."""
+            for element in self.elements[:2]: element.debug(on)
+            return self
+    brec.MelModel = _MelModel
+from ...brec import MelModel
+# Now we can import from parent game records file
+from ..skyrim.records import MelBounds, MelDestructible, MelVmad
+# Those are unused here, but need be in this file as are accessed via it
+from ..skyrim.records import MreHeader, MreNpc, MreGmst
 
 #------------------------------------------------------------------------------
 # Updated for SSE -------------------------------------------------------------
