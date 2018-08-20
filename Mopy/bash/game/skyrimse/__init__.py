@@ -58,11 +58,17 @@ class SkyrimSEGameInfo(SkyrimGameInfo):
     has_achlist = True
     check_esl = True
 
-    allTags = {u'Deactivate', u'Delev', u'Invent', u'NoMerge', u'Relev'}
+    allTags = {u'C.Acoustic', u'C.Climate', u'C.Encounter', u'C.ImageSpace',
+               u'C.Light', u'C.Location', u'C.SkyLighting', u'C.Music',
+               u'C.Name', u'C.Owner', u'C.RecordFlags', u'C.Regions',
+               u'C.Water', u'Deactivate', u'Delev', u'Filter', u'Graphics',
+               u'Invent', u'NoMerge', u'Relev', u'Sound', u'Stats', u'Names'}
 
     patchers = (
-        u'GmstTweaker', u'ImportInventory', u'ListsMerger', u'PatchMerger',
-    )
+        u'AliasesPatcher', u'CellImporter', u'GmstTweaker', u'GraphicsPatcher',
+        u'ImportInventory', u'ListsMerger', u'PatchMerger', u'SoundPatcher',
+        u'StatsPatcher', u'NamesPatcher',
+        )
 
     # MreScpt is Oblivion/FO3/FNV Only
     # MreMgef, has not been verified to be used here for Skyrim
