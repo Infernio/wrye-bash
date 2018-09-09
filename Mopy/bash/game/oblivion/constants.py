@@ -1549,7 +1549,7 @@ soundsTypes = {
 # CellImporter
 #------------------------------------------------------------------------------
 cellAutoKeys = {u'C.Climate', u'C.Light', u'C.Water', u'C.Owner', u'C.Name',
-                u'C.RecordFlags', u'C.Music'}#,u'C.Maps'}
+                u'C.RecordFlags', u'C.Music', u'C.Regions'}#,u'C.Maps'}
 cellRecAttrs = {
     u'C.Climate': ('climate',),
     u'C.Light': ('ambientRed','ambientGreen','ambientBlue','unused1',
@@ -1561,6 +1561,7 @@ cellRecAttrs = {
     u'C.Name': ('full',),
     u'C.Owner': ('ownership',),
     u'C.RecordFlags': ('flags1',), # Yes seems funky but thats the way it is
+    u'C.Regions': ('regions',),
     u'C.Water': ('water','waterHeight',),
 }
 cellRecFlags = {
@@ -1571,6 +1572,7 @@ cellRecFlags = {
     u'C.Water': 'hasWater',
     u'C.Light': '',
     u'C.RecordFlags': '',
+    u'C.Regions': '',
 }
 #------------------------------------------------------------------------------
 # GraphicsPatcher

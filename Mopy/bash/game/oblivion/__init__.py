@@ -125,7 +125,7 @@ class OblivionGameInfo(GameInfo):
 
     allTags = {u'Body-F', u'Body-M', u'Body-Size-M', u'Body-Size-F',
                u'C.Climate', u'C.Light', u'C.Music', u'C.Name',
-               u'C.RecordFlags', u'C.Owner', u'C.Water', u'Deactivate',
+               u'C.Owner', u'C.RecordFlags', u'C.Regions', u'C.Water', u'Deactivate',
                u'Delev', u'Eyes', u'Factions', u'Relations', u'Filter',
                u'Graphics', u'Hair', u'IIM', u'Invent', u'Names', u'NoMerge',
                u'NpcFaces', u'R.Relations', u'Relev', u'Scripts',
