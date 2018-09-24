@@ -104,8 +104,8 @@ if brec.MelModel is None:
             """Initialize."""
             types = self.__class__.typeSets[subType]
             MelGroup.__init__(self, attr, MelString(types[0], 'modPath'),
-                                   self.__class__.MelModelHash(types[1],
-                                                               'textureHashes'),
+                                   self.MelModelHash(types[1],
+                                                     'textureHashes'),
                                    MelMODS(types[2], 'alternateTextures'), )
 
         def debug(self, on=True):
