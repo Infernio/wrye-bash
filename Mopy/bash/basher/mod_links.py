@@ -64,8 +64,9 @@ __all__ = ['Mod_FullLoad', 'Mod_CreateDummyMasters', 'Mod_OrderByName',
            'Mod_Face_Import', 'Mod_Fids_Replace', 'Mod_SkipDirtyCheck',
            'Mod_ScanDirty', 'Mod_RemoveWorldOrphans', 'Mod_FogFixer',
            'Mod_UndeleteRefs', 'Mod_AddMaster', 'Mod_CopyToEsmp',
-           'Mod_DecompileAll', 'Mod_FlipSelf', 'Mod_FlipMasters',
-           'Mod_SetVersion', 'Mod_ListDependent', 'Mod_JumpToInstaller']
+           'Mod_DecompileAll', 'Mod_FlipEsm', 'Mod_FlipEsl',
+           'Mod_FlipMasters', 'Mod_SetVersion', 'Mod_ListDependent',
+           'Mod_JumpToInstaller']
 
 #------------------------------------------------------------------------------
 # Mod Links -------------------------------------------------------------------
@@ -1561,9 +1562,9 @@ class Mod_DecompileAll(EnabledLink):
                 self._showOk(_(u"No changes required."), fileName.s)
 
 #------------------------------------------------------------------------------
-class _Esm_Flip(EnabledLink):
+class _Esm_Esl_Flip(EnabledLink):
 
-    def _esm_flip_refresh(self, espify, updated):
+    def _esm_esl_flip_refresh(self, espify, updated):
         with balt.BusyCursor():
             ##: HACK: forcing active refresh cause mods may be reordered and
             # we then need to sync order in skyrim's plugins.txt
@@ -1575,21 +1576,24 @@ class _Esm_Flip(EnabledLink):
             # to esp from esm (Oblivion etc). Refresh saves due to esms move
         self.window.RefreshUI(redraw=updated, refreshSaves=True)
 
-class Mod_FlipSelf(_Esm_Flip):
+class Mod_FlipEsm(_Esm_Esl_Flip):
     """Flip an esp(esm) to an esm(esp). Extension must be esp."""
     _help = _(u'Flips the ESM flag on the selected plugin, turning a master '
               u'into a regular plugin and vice versa.')
 
     def _initData(self, window, selection):
-        super(Mod_FlipSelf, self)._initData(window, selection)
+        super(Mod_FlipEsm, self)._initData(window, selection)
         minfo = bosh.modInfos[selection[0]]
         self._is_esm = minfo.isEsm()
         self._text = _(u'Espify Self') if self._is_esm else _(u'Esmify Self')
 
     def _enable(self):
+        """For pre esl games check if all mods are of the same type (esm or
+        esp), based on the flag and if are all esp extension files. For esl
+        games the esp extension is even more important as esm and esl have
+        the master flag set in memory no matter what."""
         for m, minfo in self.iselected_pairs():
-            if minfo.is_esl() or \
-                    minfo.isEsm() != self._is_esm or not m.cext[-1] == u'p':
+            if m.cext[-1] != u'p' or minfo.isEsm() != self._is_esm:
                 return False
         return True
 
@@ -1606,10 +1610,46 @@ class Mod_FlipSelf(_Esm_Flip):
             header = modInfo.header
             header.flags1.esm = not header.flags1.esm
             modInfo.writeHeader()
-        self._esm_flip_refresh(self._is_esm, self.selected)
+        self._esm_esl_flip_refresh(self._is_esm, self.selected)
+
+class Mod_FlipEsl(_Esm_Esl_Flip):
+    """Flip an esp(esl) to an esl(esp)."""
+
+    def _initData(self, window, selection):
+        super(Mod_FlipEsl, self)._initData(window, selection)
+        minfo = bosh.modInfos[selection[0]]
+        self._is_esl = minfo.is_esl()
+        self._text = _(u'Drop Esl Flag') if self._is_esl else _(u'Eslify Self')
+
+    def _enable(self):
+        """Allow if all selected mods are .esp files, have not the master flag
+        set and have same esl flag."""
+        for m, minfo in self.iselected_pairs():
+            # FIXME(UT): add checks to see if we can actually flip to esl
+            if m.cext[
+                -1] != u'p' or minfo.isEsm() or minfo.is_esl() != self._is_esl:
+                return False
+        return True
+
+    @balt.conversation
+    def Execute(self):
+        message = (_(u'WARNING! For advanced modders only!') + u'\n\n' +
+            _(u'This command flips an internal bit in the mod, converting an '
+              u'esp to an esl and vice versa.  Note that it is this bit OR '
+              u'the ".esl" file extension that turns a mod into a light '
+              u'master.  We therefore disallow selecting an esl for '
+              u'converting into a light master (as it always is), as well as '
+              u'an esm as it is reported to be reserved for official mods.'))
+        if not self._askContinue(message, 'bash.flipToEslp.continue',
+                                 _(u'Flip to Esl')): return
+        for modInfo in self.iselected_infos():
+            header = modInfo.header
+            header.flags1.eslFile = not header.flags1.eslFile
+            modInfo.writeHeader()
+        self._esm_esl_flip_refresh(self._is_esl, self.selected)
 
 #------------------------------------------------------------------------------
-class Mod_FlipMasters(OneItemLink, _Esm_Flip):
+class Mod_FlipMasters(OneItemLink, _Esm_Esl_Flip):
     """Swaps masters between esp and esm versions."""
     _help = _(
         u"Flip esp/esm bit of esp masters to convert them to/from esm state")
@@ -1648,7 +1688,7 @@ class Mod_FlipMasters(OneItemLink, _Esm_Flip):
                 master_mod_info.header.flags1.esm = self.toEsm
                 master_mod_info.writeHeader()
                 updated.append(masterPath)
-        self._esm_flip_refresh(not self.toEsm, updated)
+        self._esm_esl_flip_refresh(not self.toEsm, updated)
 
 #------------------------------------------------------------------------------
 class Mod_SetVersion(OneItemLink):
