@@ -620,7 +620,7 @@ class ModInfo(FileInfo):
             except struct.error as rex:
                 raise ModError(self.name,u'Struct.error: %s' % rex)
         if bush.game.fsName in (u'Fallout4', u'Skyrim Special Edition'):
-            if self.header.flags1.eslFile:
+            if self.is_esl():
                 modInfos.esl_flagged.add(self.name)
         if bush.game.fsName == u'Skyrim Special Edition':
             if tes4_rec_header.form_version != ModReader.recHeader.plugin_form_version:
@@ -1959,10 +1959,8 @@ class ModInfos(FileInfos):
         return newMods
 
     def rescanMergeable(self, names, prog=None, doCBash=None, verbose=False):
-        if bush.game.esp.hasEsl:
-            messagetext = u"Check for ObjectIDs >0xFFF"
-        else:
-            messagetext = u"Mark Mergeable"
+        messagetext = _(u"Check for ObjectIDs >0xFFF") if bush.game.check_esl \
+            else _(u"Mark Mergeable")
         with prog or balt.Progress(_(messagetext) + u' ' * 30) as prog:
             return self._rescanMergeable(names, prog, doCBash, verbose)
 
@@ -1972,10 +1970,10 @@ class ModInfos(FileInfos):
             doCBash = CBashApi.Enabled
         elif doCBash and not CBashApi.Enabled:
             doCBash = False
-        if doCBash:
-            is_mergeable = isCBashMergeable
-        elif bush.game.esp.hasEsl:
+        if bush.game.check_esl:
             is_mergeable = hasHighForms
+        elif doCBash:
+            is_mergeable = isCBashMergeable
         else:
             is_mergeable = isPBashMergeable
         mod_mergeInfo = self.table.getColumn('mergeInfo')

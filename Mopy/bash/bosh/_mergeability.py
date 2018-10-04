@@ -113,9 +113,9 @@ def isPBashMergeable(modInfo, minfos, verbose):
     if reasons: return reasons
     return True
 
-def _is_eslCapable_no_load(modInfo, verbose):
-    reasons = []
-    if modInfo.header.flags1.esm:
+def _is_eslCapable_no_load(modInfo, reasons):
+    verbose = reasons is not None
+    if modInfo.header.flags1.esm: # FIXME why not and if not check extension too
         if not verbose: return False
         reasons.append(u'\n.    '+_(u'Is esm.'))
     if modInfo.abs_path.cext == u'.esl':
@@ -125,70 +125,54 @@ def _is_eslCapable_no_load(modInfo, verbose):
     if modInfo.isBP():
         if not verbose: return False
         reasons.append(u'\n.    '+_(u'Is Bashed Patch.'))
-    if reasons: return reasons
     return True
 
-def check_eslCapable_no_load(modInfo, verbose):
-    reasons = _is_eslCapable_no_load(modInfo, verbose)
-    if isinstance(reasons, list):
-        reasons = u''.join(reasons)
-    elif not reasons:
-        return False # non verbose mode
-    else: # True
-        reasons = u''
-    if reasons: return reasons
-    return True
-
-def check_esl_topsSkipped(modInfo, verbose=True):
+def check_esl_topsSkipped(modInfo, reasons=None, modFile=None):
+    """Return True if mod ...."""
     mergeTypes = set(recClass.classType for recClass in bush.game.mergeClasses)
-    modFile = ModFile(modInfo, LoadFactory(False, *mergeTypes))
+    modFile = modFile or ModFile(modInfo, LoadFactory(False, *mergeTypes))
+    verbose = reasons is not None
     try:
         modFile.load(True,loadStrings=False)
     except ModError as error:
         if not verbose: return False
-        # reasons += u'\n.    %s.' % error
-    if modFile.topsSkipped:
-        return True
-    return False
-
-def hasHighForms(modInfo, minfos, verbose):
-    """Returns True or error message indicating whether specified mod is mergeable."""
-    reasons = check_eslCapable_no_load(modInfo, verbose)
-    if isinstance(reasons, unicode):
-        pass
-    elif not reasons:
-        return False # non verbose mode
-    else: # True
-        reasons = u''
-    #--Load test
-    mergeTypes = set(recClass.classType for recClass in bush.game.mergeClasses)
-    modFile = ModFile(modInfo, LoadFactory(False, *mergeTypes))
-    try:
-        modFile.load(True,loadStrings=False)
-    except ModError as error:
-        if not verbose: return False
-        reasons += u'\n.    %s.' % error
+        reasons.append(u'\n.    %s.' % error)
     #--Skipped over types?
     if modFile.topsSkipped:
         if not verbose: return False
-        reasons += u'\n.    '+_(u'Record type: ')+u', '.join(sorted(modFile.topsSkipped))+u' ' \
-                                u'; currently unsupported by ESLify ' \
-                                u'verification. Use xEdit to check ESL ' \
-                                u'qualifications and modify ESL flag.'
+        reasons.append(u'\n.    ' + _(u'Record type: ') + u', '.join(sorted(
+            modFile.topsSkipped)) + u' ; currently unsupported by ESLify ' \
+                                    u'verification. Use xEdit to check ESL '
+                                    u'qualifications and modify ESL flag.')
+    return True
+
+def hasHighForms(modInfo, minfos, verbose):
+    """Returns True or error message indicating whether specified mod is
+    convertible to a light plugin."""
+    reasons = [] if verbose else None
+    eslCapable = _is_eslCapable_no_load(modInfo, reasons)
+    if not verbose and not eslCapable:
+        return False
+    modFile = ModFile(modInfo, LoadFactory(False, *set(
+        recClass.classType for recClass in bush.game.mergeClasses)))
+    eslCapable = check_esl_topsSkipped(modInfo, reasons, modFile)
+    if not verbose and not eslCapable:
+        return False
+    if isinstance(reasons, list): # verbose
+        reasons = u''.join(reasons)
     #--Form greater then 0xFFF
     lenMasters = len(modFile.tes4.masters)
-    eslCapable = True
     for type,block in modFile.tops.iteritems():
         for record in block.getActiveRecords():
             if record.fid >> 24 >= lenMasters:
                 if (record.fid & 0xFFFFFF) > 0xFFF:
+                    if not verbose: return False
                     reasons += u'\n.    ' + u'New Forms greater than 0xFFF.'
                     eslCapable = False
-                    if not eslCapable:
-                        break
+                    break
         if not eslCapable:
             break
-    if reasons: return reasons
+    if reasons is not None: return reasons # verbose
     return eslCapable
 
 def _modIsMergeableLoad(modInfo, minfos, verbose):

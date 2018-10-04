@@ -855,20 +855,19 @@ class Mod_MarkMergeable(ItemLink):
     def __init__(self,doCBash):
         Link.__init__(self)
         self.doCBash = doCBash
-        if bush.game.esp.hasEsl:
+        if bush.game.check_esl:
             self._text = _(u'Check ESL Qualifications')
+            self._help = _(
+                u'Scans the selected plugin(s) to determine whether or not '
+                u'there are one or more records with an ObjectID > 0xFFF')
         else:
             self._text = _(u'Mark Mergeable (CBash)...') if doCBash else _(
                 u'Mark Mergeable...')
-        if bush.game.esp.hasEsl:
-            self._help = _(u'Scans the selected plugin(s) to determine whether '
-                          u'or not there are one or more records with an '
-                          u'ObjectID > 0xFFF')
-        else:
-            self._help = _(u'Scans the selected plugin(s) to determine if they are '
-                          u'mergeable into the %(patch_type)s bashed patch, '
-                          u'reporting also the reason they are unmergeable') % {
-                            'patch_type': _(u'Cbash') if doCBash else _(u'Python')}
+            self._help = _(
+                u'Scans the selected plugin(s) to determine if they are '
+                u'mergeable into the %(patch_type)s bashed patch, reporting '
+                u'also the reason they are unmergeable') % {
+                    'patch_type': _(u'Cbash') if doCBash else _(u'Python')}
 
     @balt.conversation
     def Execute(self):
@@ -878,33 +877,27 @@ class Mod_MarkMergeable(ItemLink):
                x not in tagged_no_merge and x in bosh.modInfos.mergeable]
         no = set(self.selected) - set(yes)
         no = [u"%s:%s" % (x, y) for x, y in result.iteritems() if x in no]
-        if bush.game.esp.hasEsl:
-            message = u'== Plugins that qualify for ESL flagging.\n\n'
+        if bush.game.check_esl:
+            message = u'== %s\n\n' % _(
+                u'Plugins that qualify for ESL flagging.')
         else:
             message = u'== %s ' % ([u'Python', u'CBash'][self.doCBash]) + _(
                 u'Mergeability') + u'\n\n'
         if yes:
-            if bush.game.esp.hasEsl:
-                message += u'=== ' + _(u'ESL Capable') + u'\n* ' + u'\n\n* '.join(
-                x.s for x in yes)
-            else:
-                message += u'=== ' + _(u'Mergeable') + u'\n* ' + u'\n\n* '.join(
-                    x.s for x in yes)
+            message += u'=== ' + (
+                _(u'ESL Capable') if bush.game.check_esl else _(
+                    u'Mergeable')) + u'\n* ' + u'\n\n* '.join(x.s for x in yes)
         if yes and no:
             message += u'\n\n'
         if no:
-            if bush.game.esp.hasEsl:
-                message += u'=== ' + _(u'ESL Incapable') + u'\n* ' + '\n\n* '.join(
-                    no)
-            else:
-                message += u'=== ' + _(u'Not Mergeable') + u'\n* ' + '\n\n* '.join(
-                    no)
+            message += u'=== ' + (_(
+                u'ESL Incapable') if bush.game.check_esl else _(
+                u'Not Mergeable')) + u'\n* ' + '\n\n* '.join(no)
         self.window.RefreshUI(redraw=self.selected, refreshSaves=False)
         if message != u'':
-            if bush.game.esp.hasEsl:
-                self._showWryeLog(message, title=_(u'Check for ObjectIDs >0xFFF'))
-            else:
-                self._showWryeLog(message, title=_(u'Mark Mergeable'))
+            title_ = _(u'Check for ObjectIDs >0xFFF') if \
+                bush.game.check_esl else _(u'Mark Mergeable')
+            self._showWryeLog(message, title=title_)
 
 #------------------------------------------------------------------------------
 class _Mod_BP_Link(OneItemLink):
@@ -985,7 +978,7 @@ class _Mod_Patch_Update(_Mod_BP_Link):
         #--Check if we should be deactivating some plugins
         active_prior_to_patch = [x for x in mods_prior_to_patch if
                                  load_order.cached_is_active(x)]
-        if not bush.game.esp.hasEsl:
+        if not bush.game.check_esl:
             self._ask_deactivate_mergeable(active_prior_to_patch)
         previousMods = set()
         missing = collections.defaultdict(list)
@@ -1587,12 +1580,12 @@ class Mod_DecompileAll(EnabledLink):
 #------------------------------------------------------------------------------
 class _Esm_Esl_Flip(EnabledLink):
 
-    def _esm_esl_flip_refresh(self, espify, updated):
+    def _esm_esl_flip_refresh(self, rescan_mergeability, updated):
         with balt.BusyCursor():
             ##: HACK: forcing active refresh cause mods may be reordered and
             # we then need to sync order in skyrim's plugins.txt
             bosh.modInfos.refreshLoadOrder(forceRefresh=True, forceActive=True)
-            if espify: # converted to esps - rescan mergeable
+            if rescan_mergeability: # converted to esps/esls - rescan mergeable
                 bosh.modInfos.rescanMergeable(updated, bolt.Progress())
             # will be moved to the top - note that modification times won't
             # change - so mods will revert to their original position once back
@@ -1645,12 +1638,11 @@ class Mod_FlipEsl(_Esm_Esl_Flip):
         self._text = _(u'Drop Esl Flag') if self._is_esl else _(u'Eslify Self')
 
     def _enable(self):
-        """Allow if all selected mods are .esp files, have not the master flag
-        set and have same esl flag."""
+        """Allow if all selected mods are .espm files, have same esl flag and
+        are esl capable if converting to esl."""
         for m, minfo in self.iselected_pairs():
-            if m.cext[
-                -1] != u'p' or minfo.isEsm() or minfo.is_esl() != \
-                    self._is_esl or not m in bosh.modInfos.mergeable:
+            if m.cext[-1] not in u'pm' or minfo.is_esl() != self._is_esl \
+                    or (not self._is_esl and not m in bosh.modInfos.mergeable):
                 return False
         return True
 
@@ -1669,7 +1661,7 @@ class Mod_FlipEsl(_Esm_Esl_Flip):
             header = modInfo.header
             header.flags1.eslFile = not header.flags1.eslFile
             modInfo.writeHeader()
-        self._esm_esl_flip_refresh(self._is_esl, self.selected)
+        self._esm_esl_flip_refresh(True, self.selected) # True to rescan esls!
 
 #------------------------------------------------------------------------------
 class Mod_FlipMasters(OneItemLink, _Esm_Esl_Flip):

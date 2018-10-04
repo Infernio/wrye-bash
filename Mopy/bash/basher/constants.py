@@ -132,7 +132,7 @@ colorInfo = {
         _(u'This is the background color used for images.'),
     ),
 }
-if bush.game.esp.hasEsl:
+if bush.game.check_esl:
     colorInfo['mods.text.mergeable'] = (_(u'Esl Capable plugin'),
             _(u'Tabs: Mods') + u'\n\n' +
             _(u'This is the text color used for Esl Capable plugins.'),

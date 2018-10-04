@@ -410,7 +410,7 @@ class MasterList(_ModsUIList):
             item_format.text_key = 'mods.text.esl'
             mouseText += _(u"ESL Flagged file. ")
         elif masters_name in bosh.modInfos.mergeable:
-            if u'NoMerge' in fileBashTags and not bush.game.esp.hasEsl:
+            if u'NoMerge' in fileBashTags and not bush.game.check_esl:
                 item_format.text_key = 'mods.text.noMerge'
                 mouseText += _(u"Technically mergeable but has NoMerge tag.  ")
             else:
@@ -830,17 +830,14 @@ class ModList(_ModsUIList):
         elif mod_name in bosh.modInfos.bashed_patches:
             item_format.text_key = 'mods.text.bashedPatch'
         elif mod_name in bosh.modInfos.mergeable:
-            if u'NoMerge' in fileBashTags and not bush.game.esp.hasEsl:
+            if u'NoMerge' in fileBashTags and not bush.game.check_esl:
                 item_format.text_key = 'mods.text.noMerge'
                 mouseText += _(u"Technically mergeable but has NoMerge tag.  ")
             else:
                 # TODO: ESL flagged message needs to be updated
                 item_format.text_key = 'mods.text.mergeable'
-                if bush.game.esp.hasEsl:
-                    if checkMark == 2:
-                        mouseText += _(u"Qualifies to be ESL flagged.  ")
-                    else:
-                        mouseText += _(u"Qualifies to be ESL flagged.  ")
+                if bush.game.check_esl:
+                    mouseText += _(u"Qualifies to be ESL flagged.  ")
                 else:
                     if checkMark == 2:
                         mouseText += _(u"Merged into Bashed Patch.  ")
