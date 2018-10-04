@@ -57,6 +57,9 @@ class SkyrimSEGameInfo(SkyrimGameInfo):
     espm_extensions = {u'.esp', u'.esm', u'.esl'}
     has_achlist = True
 
+    class esp(SkyrimGameInfo.esp):
+        hasEsl = True
+
     allTags = {u'Deactivate', u'Delev', u'Invent', u'NoMerge', u'Relev'}
 
     patchers = (

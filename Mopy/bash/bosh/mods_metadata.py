@@ -31,6 +31,7 @@ from ..brec import ModReader, MreRecord
 from ..cint import ObBaseRecord, ObCollection
 from ..exception import BoltError, CancelError, ModError
 from ..patcher import getPatchesPath, getPatchesList
+from ._mergeability import check_esl_topsSkipped
 
 try:
     import loot_api
@@ -358,8 +359,17 @@ class ConfigHelpers:
             if path.mtime != ruleSet.mtime:
                 ModRuleSet.RuleParser(ruleSet).parse(path)
 
-    _cleaning_wiki_url = (u'[[!http://cs.elderscrolls.com/constwiki/index.php/'
-                          u'TES4Edit_Cleaning_Guide|TES4Edit Cleaning Guide]]')
+    _cleaning_wiki_url = (u'[[!https://tes5edit.github.io/docs/5-mod-cleaning-and-error-checking.html]]')
+    def filesCanBeESLFlagged(self, minfos, activeList):
+        shouldMerge = set()
+        if bush.game.esp.hasEsl:
+            for m in minfos.mergeable:
+                if not minfos[m].header.flags1.eslFile:
+                    shouldMerge.add(m)
+        else:
+            shouldMerge = activeList & minfos.mergeable
+        return shouldMerge
+
     def checkMods(self, showModList=False, showRuleSets=False, showNotes=False,
                   showConfig=True, showSuggest=True, showCRC=False,
                   showVersion=True, showWarn=True, mod_checker=None):
@@ -370,14 +380,27 @@ class ConfigHelpers:
         merged_ = modInfos.merged
         imported_ = modInfos.imported
         activeMerged = active | merged_
+        removeEslFlag = set()
         warning = u'=== <font color=red>'+_(u'WARNING:')+u'</font> '
         #--Header
         with sio() as out:
             log = bolt.LogFile(out)
             log.setHeader(u'= '+_(u'Check Mods'),True)
-            log(_(u'This is a report on your currently active/merged mods.'))
+            if bush.game.esp.hasEsl:
+                log(_(u'This is a report on your currently installed or active '
+                      u'mods.'))
+            else:
+                log(_(u'This is a report on your currently installed, '
+                      u'active, or merged mods.'))
             #--Mergeable/NoMerge/Deactivate tagged mods
-            shouldMerge = active & modInfos.mergeable
+            shouldMerge = self.filesCanBeESLFlagged(modInfos, active)
+            if bush.game.esp.hasEsl:
+                for m in modInfos.esl_flagged:
+                    if not check_esl_topsSkipped(modInfos[m]):
+                        if modInfos[m].header.flags1.eslFile and m not in modInfos.mergeable:
+                            if not modInfos[m].abs_path.cext in (u'.esm', u'.esl'):
+                                if not (modInfos[m].header.flags1.esm and modInfos[m].header.flags1.eslFile):
+                                        removeEslFlag.add(m)
             shouldDeactivateA, shouldDeactivateB = [], []
             for x in active:
                 tags = modInfos[x].getBashTags()
@@ -421,12 +444,28 @@ class ConfigHelpers:
             for mod in tuple(shouldMerge):
                 if u'NoMerge' in modInfos[mod].getBashTags():
                     shouldMerge.discard(mod)
-            if shouldMerge:
-                log.setHeader(u'=== '+_(u'Mergeable'))
-                log(_(u'Following mods are active, but could be merged into '
-                      u'the bashed patch.'))
-                for mod in sorted(shouldMerge):
-                    log(u'* __'+mod.s+u'__')
+            if bush.game.esp.hasEsl:
+                if shouldMerge:
+                    log.setHeader(u'=== '+_(u'ESL Capable'))
+                    log(_(u'Following mods could be assigned an ESL flag but '
+                          u'are not ESL flagged.'))
+                    for mod in sorted(shouldMerge):
+                        log(u'* __'+mod.s+u'__')
+            else:
+                if shouldMerge:
+                    log.setHeader(u'=== ' + _(u'Mergeable'))
+                    log(_(u'Following mods are active, but could be merged into '
+                          u'the bashed patch.'))
+                    for mod in sorted(shouldMerge):
+                        log(u'* __' + mod.s + u'__')
+            if bush.game.esp.hasEsl:
+                if removeEslFlag:
+                    log.setHeader(u'=== ' + _(u'Remove ESL Flag'))
+                    log(_(u'Following mods have an ESL flag, but do not qualify.'
+                          u'These mods have one or more ObjectIDs that are '
+                          u'greater then 0xFFF.'))
+                    for mod in sorted(removeEslFlag):
+                        log(u'* __' + mod.s + u'__')
             if shouldDeactivateB:
                 log.setHeader(u'=== '+_(u'NoMerge Tagged Mods'))
                 log(_(u'Following mods are tagged NoMerge and should be '
@@ -469,14 +508,17 @@ class ConfigHelpers:
                 log.setHeader(
                     u'=== ' + _(u'Mods that need cleaning with TES4Edit'))
                 log(_(u'Congratulations all mods appear clean.'))
+            ver_list = u'('
+            for ver in sorted(bush.game.esp.validHeaderVersions):
+                ver_list += (u' __' + str(ver) + u'__ ')
+            ver_list += (u')')
             if invalidVersion:
                 log.setHeader(
                     u'=== ' + _(u'Mods with non standard TES4 versions'))
                 log(_(u"Following mods have a TES4 version that isn't "
-                      u"recognized as one of the standard versions (0.8 and "
-                      u"1.0).  It is untested what effect this can have on "
-                      u"the game, but presumably Oblivion will refuse to "
-                      u"load anything above 1.0"))
+                      u"recognized as one of the standard versions "
+                      u"{}.  It is untested what effect this can have on "
+                      u"{}.").format(ver_list, bush.game.displayName))
                 for mod in sorted(invalidVersion):
                     log(u'* __'+mod[0].s+u':__  '+mod[1])
             #--Missing/Delinquent Masters

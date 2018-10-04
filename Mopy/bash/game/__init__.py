@@ -181,6 +181,7 @@ class GameInfo(object):
     # Plugin format stuff
     class esp(object):
         # Wrye Bash capabilities
+        hasEsl = False
         canBash = False         # Can create Bashed Patches
         canCBash = False        # CBash can handle this game's records
         canEditHeader = False   # Can edit basic info in the TES4 record

@@ -113,6 +113,84 @@ def isPBashMergeable(modInfo, minfos, verbose):
     if reasons: return reasons
     return True
 
+def _is_eslCapable_no_load(modInfo, verbose):
+    reasons = []
+    if modInfo.header.flags1.esm:
+        if not verbose: return False
+        reasons.append(u'\n.    '+_(u'Is esm.'))
+    if modInfo.abs_path.cext == u'.esl':
+        if not verbose: return False
+        reasons.append(u'\n.    ' + _(u'Is .esl file.'))
+    #--Bashed Patch
+    if modInfo.isBP():
+        if not verbose: return False
+        reasons.append(u'\n.    '+_(u'Is Bashed Patch.'))
+    if reasons: return reasons
+    return True
+
+def check_eslCapable_no_load(modInfo, verbose):
+    reasons = _is_eslCapable_no_load(modInfo, verbose)
+    if isinstance(reasons, list):
+        reasons = u''.join(reasons)
+    elif not reasons:
+        return False # non verbose mode
+    else: # True
+        reasons = u''
+    if reasons: return reasons
+    return True
+
+def check_esl_topsSkipped(modInfo, verbose=True):
+    mergeTypes = set(recClass.classType for recClass in bush.game.mergeClasses)
+    modFile = ModFile(modInfo, LoadFactory(False, *mergeTypes))
+    try:
+        modFile.load(True,loadStrings=False)
+    except ModError as error:
+        if not verbose: return False
+        # reasons += u'\n.    %s.' % error
+    if modFile.topsSkipped:
+        return True
+    return False
+
+def hasHighForms(modInfo, minfos, verbose):
+    """Returns True or error message indicating whether specified mod is mergeable."""
+    reasons = check_eslCapable_no_load(modInfo, verbose)
+    if isinstance(reasons, unicode):
+        pass
+    elif not reasons:
+        return False # non verbose mode
+    else: # True
+        reasons = u''
+    #--Load test
+    mergeTypes = set(recClass.classType for recClass in bush.game.mergeClasses)
+    modFile = ModFile(modInfo, LoadFactory(False, *mergeTypes))
+    try:
+        modFile.load(True,loadStrings=False)
+    except ModError as error:
+        if not verbose: return False
+        reasons += u'\n.    %s.' % error
+    #--Skipped over types?
+    if modFile.topsSkipped:
+        if not verbose: return False
+        reasons += u'\n.    '+_(u'Record type: ')+u', '.join(sorted(modFile.topsSkipped))+u' ' \
+                                u'; currently unsupported by ESLify ' \
+                                u'verification. Use xEdit to check ESL ' \
+                                u'qualifications and modify ESL flag.'
+    #--Form greater then 0xFFF
+    lenMasters = len(modFile.tes4.masters)
+    eslCapable = True
+    for type,block in modFile.tops.iteritems():
+        for record in block.getActiveRecords():
+            if record.fid >> 24 >= lenMasters:
+                if (record.fid & 0xFFFFFF) > 0xFFF:
+                    reasons += u'\n.    ' + u'New Forms greater than 0xFFF.'
+                    eslCapable = False
+                    if not eslCapable:
+                        break
+        if not eslCapable:
+            break
+    if reasons: return reasons
+    return eslCapable
+
 def _modIsMergeableLoad(modInfo, minfos, verbose):
     """Check if mod is mergeable, loading it and taking into account the
     rest of mods."""

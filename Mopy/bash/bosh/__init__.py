@@ -42,7 +42,7 @@ from collections import OrderedDict
 from functools import wraps, partial
 from itertools import imap
 #--Local
-from ._mergeability import isPBashMergeable, isCBashMergeable
+from ._mergeability import isPBashMergeable, isCBashMergeable, hasHighForms
 from .mods_metadata import ConfigHelpers
 from .. import bass, bolt, balt, bush, env, load_order, archives, \
     initialization
@@ -619,6 +619,9 @@ class ModInfo(FileInfo):
                                                               ins, True)
             except struct.error as rex:
                 raise ModError(self.name,u'Struct.error: %s' % rex)
+        if bush.game.fsName in (u'Fallout4', u'Skyrim Special Edition'):
+            if self.header.flags1.eslFile:
+                modInfos.esl_flagged.add(self.name)
         if bush.game.fsName == u'Skyrim Special Edition':
             if tes4_rec_header.form_version != ModReader.recHeader.plugin_form_version:
                 modInfos.sse_form43.add(self.name)
@@ -1646,6 +1649,7 @@ class ModInfos(FileInfos):
         self.new_missing_strings = set() #--Set of new mods with missing .STRINGS files
         self.activeBad = set() #--Set of all mods with bad names that are active
         self.sse_form43 = set()
+        self.esl_flagged = set()
         # sentinel for calculating info sets when needed in gui and patcher
         # code, **after** self is refreshed
         self.__calculate = object()
@@ -1955,7 +1959,11 @@ class ModInfos(FileInfos):
         return newMods
 
     def rescanMergeable(self, names, prog=None, doCBash=None, verbose=False):
-        with prog or balt.Progress(_(u"Mark Mergeable") + u' ' * 30) as prog:
+        if bush.game.esp.hasEsl:
+            messagetext = u"Check for ObjectIDs >0xFFF"
+        else:
+            messagetext = u"Mark Mergeable"
+        with prog or balt.Progress(_(messagetext) + u' ' * 30) as prog:
             return self._rescanMergeable(names, prog, doCBash, verbose)
 
     def _rescanMergeable(self, names, progress, doCBash, verbose):
@@ -1964,7 +1972,12 @@ class ModInfos(FileInfos):
             doCBash = CBashApi.Enabled
         elif doCBash and not CBashApi.Enabled:
             doCBash = False
-        is_mergeable = isCBashMergeable if doCBash else isPBashMergeable
+        if doCBash:
+            is_mergeable = isCBashMergeable
+        elif bush.game.esp.hasEsl:
+            is_mergeable = hasHighForms
+        else:
+            is_mergeable = isPBashMergeable
         mod_mergeInfo = self.table.getColumn('mergeInfo')
         progress.setFull(max(len(names),1))
         result, tagged_no_merge = OrderedDict(), set()
