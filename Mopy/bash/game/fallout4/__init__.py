@@ -117,7 +117,7 @@ class Fallout4GameInfo(GameInfo):
         canEditHeader = True
         validHeaderVersions = (0.95,)
 
-    allTags = {u'Delev', u'NoMerge', u'Relev'}
+    allTags = {u'Delev', u'Relev'}
 
     patchers = (u'ListsMerger',)
 
