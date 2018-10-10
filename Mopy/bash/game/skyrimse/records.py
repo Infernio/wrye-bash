@@ -25,7 +25,7 @@
 imported from skyrim, but only after setting MelModel to the SSE format."""
 from ... import brec
 from ...bass import null1, null2, null3, null4
-from ...bolt import Flags, struct_pack, encode
+from ...bolt import Flags, struct_pack, encode, DataDict
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelString, MelSet, MelFid, MelOptStruct, MelFids, MelBase, MelGroup, \
     MelStructA, MelLString, MelCountedFidList
@@ -700,6 +700,21 @@ class MreLens(MelRecord):
             (1, 'shrinksWhenOccluded'),
         ))
 
+    #--DNAM loader
+    class MelDnamLoaders(DataDict):
+        """Since DNAM subrecords occur in two different places, we need
+        to replace ordinary 'loaders' dictionary with a 'dictionary' that will
+        return the correct element to handle the CNAM subrecord. 'Correct'
+        element is determined by which other subrecords have been encountered."""
+        def __init__(self,loaders,lensinfo,sprites):
+            self.data = loaders
+            self.type_dnam = {'EDID':lensinfo, 'LFSP':sprites}
+            self.dnam = lensinfo #--Which dnam element loader to use next.
+        def __getitem__(self,key):
+            if key == 'DNAM': return self.dnam
+            self.dnam = self.type_dnam.get(key, self.dnam)
+            return self.data[key]
+
     melSet = MelSet(
         MelString('EDID','eid'),
         MelStruct('CNAM','f','colorInfluence'),
@@ -713,4 +728,6 @@ class MreLens(MelRecord):
                 (LensFlareFlags, 'lensFlags', 0L), ),
             )
         )
+    melSet.loaders = MelDnamLoaders(melSet.loaders, melSet.elements[2],
+                                    melSet.elements[4])
     __slots__ = melSet.getSlotsUsed()
