@@ -140,7 +140,7 @@ class SkyrimGameInfo(GameInfo):
                u'NoMerge', u'Relev', u'Sound', u'Stats', u'Names'}
 
     patchers = (
-        u'AliasesPatcher', u'CellImporter', u'GmstTweaker', u'GraphicsPatcher',
+        u'CellImporter', u'GmstTweaker', u'GraphicsPatcher',
         u'ImportInventory', u'ListsMerger', u'PatchMerger', u'SoundPatcher',
         u'StatsPatcher', u'NamesPatcher',
         )
