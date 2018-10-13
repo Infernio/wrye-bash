@@ -37,7 +37,7 @@ from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
     MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelFidList, \
     MelStructA, MreRecord, MreGmstBase, MelLString, MelCountedFidList, \
-    MelOptStructA, MelCountedFids, MelSortedFidList, MelStrings
+    MelCountedFids, MelSortedFidList, MelStrings
 from ...exception import BoltError, ModError, ModSizeError, StateError
 # Set MelModel in brec but only if unset, otherwise we are being imported from
 # skyrimse.records
@@ -4302,7 +4302,7 @@ class MreMust(MelRecord):
         MelOptStruct('DNAM','I','fadeOut'),
         MelString('ANAM','trackFilename'),
         MelString('BNAM','finaleFilename'),
-        MelOptStructA('FNAM','f','cuePoints'),
+        MelStructA('FNAM','f','points',('cuePoints',0.0)),
         MelOptStruct('LNAM','2fI','loopBegins','loopEnds','loopCount',),
         MelStruct('CITC','I','conditionCount'),
         MelConditions(),
