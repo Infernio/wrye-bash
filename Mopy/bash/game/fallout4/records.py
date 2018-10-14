@@ -21,15 +21,118 @@
 #  https://github.com/wrye-bash
 #
 # =============================================================================
+"""This module contains the Fallout 4 record classes. The great majority are
+imported from skyrim, but only after setting MelModel to the FO4 format."""
+import itertools
 
-"""This module contains the Fallout 4 record classes."""
-from ..skyrim.records import MelBounds, MreLeveledList
-from ...brec import MreHeaderBase, MelSet, MelStruct, MelUnicode, MelNull, \
-    MelFidList, MelBase, MelOptStruct, MelStructA, MelFid, MelLString, \
-    MelString, MreLeveledListBase, FID
+from ... import brec
+from ...bass import null1, null2, null3, null4
+from ...bolt import Flags, struct_pack, encode
+from ...brec import MelBase, MelGroup, MreHeaderBase, MelSet, MelString, \
+    MelStruct, MelUnicode, MelNull, MelFidList, MreLeveledListBase, \
+    MelGroups, MelFid, FID, MelOptStruct, MelLString, MelStructA
+from ...exception import ModSizeError
+# Set brec.MelModel to the Fallout 4 one - do not import from skyrim.records yet
+
+class MelMODS(MelBase): # copy pasted from game.skyrim.records.MelMODS
+    """MODS/MO2S/etc/DMDS subrecord"""
+    def hasFids(self,formElements):
+        """Include self if has fids."""
+        formElements.add(self)
+
+    def setDefault(self,record):
+        """Sets default value for record instance."""
+        record.__setattr__(self.attr,None)
+
+    def loadData(self, record, ins, sub_type, size_, readId):
+        """Reads data from ins into record attribute."""
+        insUnpack = ins.unpack
+        count, = insUnpack('I',4,readId)
+        data = []
+        dataAppend = data.append
+        for x in xrange(count):
+            string = ins.readString32(readId)
+            fid = ins.unpackRef()
+            index, = ins.unpack('I',4,readId)
+            dataAppend((string,fid,index))
+        record.__setattr__(self.attr,data)
+
+    def dumpData(self,record,out):
+        """Dumps data from record to outstream."""
+        data = record.__getattribute__(self.attr)
+        if data is not None:
+            data = record.__getattribute__(self.attr)
+            outData = struct_pack('I', len(data))
+            for (string,fid,index) in data:
+                outData += struct_pack('I', len(string))
+                outData += encode(string)
+                outData += struct_pack('=2I', fid, index)
+            out.packSub(self.subType,outData)
+
+    def mapFids(self,record,function,save=False):
+        """Applies function to fids.  If save is true, then fid is set
+           to result of function."""
+        attr = self.attr
+        data = record.__getattribute__(attr)
+        if data is not None:
+            data = [(string,function(fid),index) for (string,fid,index) in record.__getattribute__(attr)]
+            if save: record.__setattr__(attr,data)
+
+if brec.MelModel is None:
+    class _MelModel(MelGroup):
+        """Represents a model record."""
+        # MODB and MODD are no longer used by TES5Edit
+        typeSets = {'MODL': ('MODL', 'MODT', 'MODS'),
+                    'MOD2': ('MOD2', 'MO2T', 'MO2S'),
+                    'MOD3': ('MOD3', 'MO3T', 'MO3S'),
+                    'MOD4': ('MOD4', 'MO4T', 'MO4S'),
+                    'MOD5': ('MOD5', 'MO5T', 'MO5S'),
+                    'DMDL': ('DMDL', 'DMDT', 'DMDS'), }
+
+        class MelModelHash(MelBase):
+            """textureHashes are not used for loose files. There is never a
+            Bashed Patch, 0.bsa. The record will be read if
+            present but no defaults are set and the record will not be written."""
+            def loadData(self, record, ins, sub_type, size_, readId):
+                MelBase.loadData(self, record, ins, sub_type, size_, readId)
+            def getSlotsUsed(self):
+                return ()
+            def setDefault(self,record): return
+            def dumpData(self,record,out): return
+
+        def __init__(self, attr='model', subType='MODL'):
+            """Initialize."""
+            types = self.__class__.typeSets[subType]
+            MelGroup.__init__(self, attr, MelString(types[0],'modPath'),
+                              self.MelModelHash(types[1],'textureHashes'),
+                              MelMODS(types[2],'alternateTextures'), )
+
+        def debug(self, on=True):
+            """Sets debug flag on self."""
+            for element in self.elements[:2]: element.debug(on)
+            return self
+    brec.MelModel = _MelModel
+from ...brec import MelModel
+# Now we can import from parent game records file
+from ..skyrim.records import MelBounds
+# Those are unused here, but need be in this file as are accessed via it
+from ..skyrim.records import MreGmst
+
+from_iterable = itertools.chain.from_iterable
 
 #------------------------------------------------------------------------------
-# Fallout 4 Records -----------------------------------------------------------
+# Record Elements    ----------------------------------------------------------
+#------------------------------------------------------------------------------
+class MelCoed(MelOptStruct):
+    """Needs custom unpacker to look at FormID type of owner.  If owner is an
+	NPC then it is followed by a FormID.  If owner is a faction then it is
+	followed by an signed integer or '=Iif' instead of '=IIf' """ # see #282
+    def __init__(self):
+        MelOptStruct.__init__(self,'COED','=IIf',(FID,'owner'),(FID,'glob'),
+                              'itemCondition')
+
+#------------------------------------------------------------------------------
+# Fallout 4 Records  ----------------------------------------------------------
 #------------------------------------------------------------------------------
 class MreHeader(MreHeaderBase):
     """TES4 Record.  File header."""
@@ -47,19 +150,35 @@ class MreHeader(MreHeaderBase):
         MelBase('SCRN', 'scrn_p'),
         MelBase('INTV','intv_p'),
         MelBase('INCC', 'incc_p'),
-        ## TODO: When the GECK is released, check on the following:
-        ##  - verify MAST is still used to not masters
-        ##  - check if DATA is present along with MAST
-        ##  - verify ONAM is still used for overrides
-        ##  - check if SNAM is used at all
-        ##  - check if SCRN is used at all
         )
     __slots__ = melSet.getSlotsUsed()
 
 #------------------------------------------------------------------------------
+# Marker for organization please don't remove ---------------------------------
+# GLOB ------------------------------------------------------------------------
+# Defined in brec.py as class MreGlob(MelRecord) ------------------------------
+#------------------------------------------------------------------------------
+class MreLeveledList(MreLeveledListBase):
+    """Skyrim Leveled item/creature/spell list."""
+
+    class MelLevListLvlo(MelGroups):
+        def __init__(self):
+            MelGroups.__init__(self,'entries',
+                MelStruct('LVLO','=3I','level',(FID,'listId',None),('count',1)),
+                MelCoed(),
+                )
+        def dumpData(self,record,out):
+            out.packSub('LLCT','B',len(record.entries))
+            MelGroups.dumpData(self,record,out)
+
+    __slots__ = MreLeveledListBase.__slots__
+
+
+#------------------------------------------------------------------------------
 class MreLvli(MreLeveledList):
     classType = 'LVLI'
-    copyAttrs = ('chanceNone','glob',)
+    copyAttrs = ('chanceNone','maxCount','glob','filterKeywordChances',
+                 'epicLootChance','overrideName')
 
     melSet = MelSet(
         MelString('EDID','eid'),
@@ -70,7 +189,8 @@ class MreLvli(MreLeveledList):
         MelOptStruct('LVLG','I',(FID,'glob')),
         MelNull('LLCT'),
         MreLeveledList.MelLevListLvlo(),
-        MelStructA('LLKC','2I','filterKeywordChances',(FID, 'keyword'), 'chance'),
+        MelStructA('LLKC','2I','filterKeywordChances',(FID,'keyword',None),
+                      ('chance',0)),
         MelFid('LVSG', 'epicLootChance'),
         MelLString('ONAM', 'overrideName')
         )
@@ -79,7 +199,8 @@ class MreLvli(MreLeveledList):
 #------------------------------------------------------------------------------
 class MreLvln(MreLeveledList):
     classType = 'LVLN'
-    copyAttrs = ('chanceNone','model','modt_p',)
+    copyAttrs = ('chanceNone','maxCount','glob','filterKeywordChances',
+                 'model','modt_p')
 
     melSet = MelSet(
         MelString('EDID','eid'),
@@ -90,7 +211,8 @@ class MreLvln(MreLeveledList):
         MelOptStruct('LVLG','I',(FID,'glob')),
         MelNull('LLCT'),
         MreLeveledList.MelLevListLvlo(),
-        MelStructA('LLKC','2I','filterKeywordChances',(FID, 'keyword'), 'chance'),
+        MelStructA('LLKC','2I','filterKeywordChances',(FID,'keyword',None),
+                      ('chance',0)),
         MelString('MODL','model'),
         MelBase('MODT','modt_p'),
         )
