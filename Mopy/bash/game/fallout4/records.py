@@ -82,12 +82,13 @@ if brec.MelModel is None:
     class _MelModel(MelGroup):
         """Represents a model record."""
         # MODB and MODD are no longer used by TES5Edit
-        typeSets = {'MODL': ('MODL', 'MODT', 'MODS'),
-                    'MOD2': ('MOD2', 'MO2T', 'MO2S'),
-                    'MOD3': ('MOD3', 'MO3T', 'MO3S'),
-                    'MOD4': ('MOD4', 'MO4T', 'MO4S'),
-                    'MOD5': ('MOD5', 'MO5T', 'MO5S'),
-                    'DMDL': ('DMDL', 'DMDT', 'DMDS'), }
+        typeSets = {'MODL': ('MODL', 'MODT', 'MODC', 'MODS', 'MODF'),
+                    'MOD2': ('MOD2', 'MODT', 'MO2C', 'MO2S', 'MO2F'),
+                    'MOD3': ('MOD3', 'MODT', 'MO3C', 'MO3S', 'MO3F'),
+                    'MOD4': ('MOD4', 'MODT', 'MO4C', 'MO4S', 'MO4F'),
+                    'MOD5': ('MOD5', 'MODT', 'MO5C', 'MO5S', 'MO5F'),
+                    # Destructible
+                    'DMDL': ('DMDL', 'DMDT', 'DMDC', 'DMDS'), }
 
         class MelModelHash(MelBase):
             """textureHashes are not used for loose files. There is never a
@@ -103,9 +104,13 @@ if brec.MelModel is None:
         def __init__(self, attr='model', subType='MODL'):
             """Initialize."""
             types = self.__class__.typeSets[subType]
-            MelGroup.__init__(self, attr, MelString(types[0],'modPath'),
-                              self.MelModelHash(types[1],'textureHashes'),
-                              MelMODS(types[2],'alternateTextures'), )
+            MelGroup.__init__(
+                self, attr, MelString(types[0], 'modPath'),
+                self.MelModelHash(types[1], 'textureHashes'),
+                MelOptStruct(types[2], 'f', 'colorRemappingIndex'),
+                MelOptStruct(types[3], 'I', (FID,'materialSwap')),
+                MelBase(types[3], 'modf_p'),
+                )
 
         def debug(self, on=True):
             """Sets debug flag on self."""
