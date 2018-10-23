@@ -39,6 +39,50 @@ from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     MreGmstBase, MelStrings, MelFull0, MelTuple
 from ...exception import BoltError, ModError, ModSizeError, StateError
 # Set MelModel in brec but only if unset
+class MelMODS(MelBase):
+    """MODS/MO2S/etc/DMDS subrecord"""
+    def hasFids(self,formElements):
+        """Include self if has fids."""
+        formElements.add(self)
+
+    def setDefault(self,record):
+        """Sets default value for record instance."""
+        record.__setattr__(self.attr,None)
+
+    def loadData(self, record, ins, sub_type, size_, readId):
+        """Reads data from ins into record attribute."""
+        insUnpack = ins.unpack
+        count, = insUnpack('I',4,readId)
+        data = []
+        dataAppend = data.append
+        for x in xrange(count):
+            string = ins.readString32(readId)
+            fid = ins.unpackRef()
+            index, = ins.unpack('I',4,readId)
+            dataAppend((string,fid,index))
+        record.__setattr__(self.attr,data)
+
+    def dumpData(self,record,out):
+        """Dumps data from record to outstream."""
+        data = record.__getattribute__(self.attr)
+        if data is not None:
+            data = record.__getattribute__(self.attr)
+            outData = struct_pack('I', len(data))
+            for (string,fid,index) in data:
+                outData += struct_pack('I', len(string))
+                outData += encode(string)
+                outData += struct_pack('=2I', fid, index)
+            out.packSub(self.subType,outData)
+
+    def mapFids(self,record,function,save=False):
+        """Applies function to fids.  If save is true, then fid is set
+           to result of function."""
+        attr = self.attr
+        data = record.__getattribute__(attr)
+        if data is not None:
+            data = [(string,function(fid),index) for (string,fid,index) in record.__getattribute__(attr)]
+            if save: record.__setattr__(attr,data)
+
 if brec.MelModel is None:
     class _MelModel(brec.MelGroup):
         """Represents a model record."""
@@ -410,52 +454,6 @@ class MreLeveledList(MelRecord):
             self.mergeSources = [otherMod]
         #--Done
         self.setChanged(self.mergeOverLast)
-
-#------------------------------------------------------------------------------
-class MelMODS(MelBase):
-    """MODS/MO2S/etc/DMDS subrecord"""
-    def hasFids(self,formElements):
-        """Include self if has fids."""
-        formElements.add(self)
-
-    def setDefault(self,record):
-        """Sets default value for record instance."""
-        record.__setattr__(self.attr,None)
-
-    def loadData(self, record, ins, sub_type, size_, readId):
-        """Reads data from ins into record attribute."""
-        insUnpack = ins.unpack
-        insRead32 = ins.readString32
-        count, = insUnpack('I',4,readId)
-        data = []
-        dataAppend = data.append
-        for x in xrange(count):
-            string = insRead32(readId)
-            fid = ins.unpackRef()
-            index, = insUnpack('I',4,readId)
-            dataAppend((string,fid,index))
-        record.__setattr__(self.attr,data)
-
-    def dumpData(self,record,out):
-        """Dumps data from record to outstream."""
-        data = record.__getattribute__(self.attr)
-        if data is not None:
-            data = record.__getattribute__(self.attr)
-            outData = struct_pack('I', len(data))
-            for (string,fid,index) in data:
-                outData += struct_pack('I', len(string))
-                outData += encode(string)
-                outData += struct_pack('=2I', fid, index)
-            out.packSub(self.subType,outData)
-
-    def mapFids(self,record,function,save=False):
-        """Applies function to fids.  If save is true, then fid is set
-           to result of function."""
-        attr = self.attr
-        data = record.__getattribute__(attr)
-        if data is not None:
-            data = [(string,function(fid),index) for (string,fid,index) in record.__getattribute__(attr)]
-            if save: record.__setattr__(attr,data)
 
 #------------------------------------------------------------------------------
 class MelOwnership(MelGroup):
