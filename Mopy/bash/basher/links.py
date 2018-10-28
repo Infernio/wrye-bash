@@ -290,6 +290,7 @@ def InitInstallerLinks():
     #--Install, uninstall, etc.
     InstallersList.itemMenu.append(Installer_Anneal())
     InstallersList.itemMenu.append(Installer_Install())
+    InstallersList.itemMenu.append(Installer_Fomod())
     if bEnableWizard:
         wizardMenu = MenuLink(_(u"Wizard Installer.."))
         wizardMenu.links.append(Installer_Wizard(False))
