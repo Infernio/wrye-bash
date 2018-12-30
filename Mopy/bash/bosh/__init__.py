@@ -218,6 +218,14 @@ class MasterInfo:
         else:
             return self.name.cext == u'.esm'
 
+    def is_esl(self):
+        """Check if this is a light plugin - .esl files are automatically
+        set the light flag, for espms check the flag."""
+        if self.modInfo:
+            return self.modInfo.is_esl()
+        else:
+            return self.name.cext == u'.esl'
+
     def hasTimeConflict(self):
         """True if has an mtime conflict with another mod."""
         if self.modInfo:

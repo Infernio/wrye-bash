@@ -405,6 +405,10 @@ class MasterList(_ModsUIList):
         if masterInfo.isEsm():
             item_format.text_key = 'mods.text.esm'
             mouseText += _(u"Master file. ")
+        # Returnig ESL flag for masters even when file not ESL flagged
+        if masterInfo.is_esl():
+            item_format.text_key = 'mods.text.esl'
+            mouseText += _(u"ESL Flagged file. ")
         elif masters_name in bosh.modInfos.mergeable:
             if u'NoMerge' in fileBashTags:
                 item_format.text_key = 'mods.text.noMerge'
@@ -820,6 +824,9 @@ class ModList(_ModsUIList):
         if mod_info.isEsm():
             item_format.text_key = 'mods.text.esm'
             mouseText += _(u"Master file. ")
+        if mod_info.is_esl():
+            item_format.text_key = 'mods.text.esl'
+            mouseText += _(u"ESL Flagged file. ")
         elif mod_name in bosh.modInfos.bashed_patches:
             item_format.text_key = 'mods.text.bashedPatch'
         elif mod_name in bosh.modInfos.mergeable:
