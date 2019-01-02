@@ -491,7 +491,7 @@ def InitModLinks():
             exportMenu.links.append(CBash_Mod_CellBlockInfo_Export())
             exportMenu.links.append(Mod_EditorIds_Export())
             ## exportMenu.links.append(Mod_ItemData_Export())
-            if bush.game.fsName == u'Skyrim':
+            if bush.game.fsName == u'Skyrim' or u'Skyrim Special Edition':
                 exportMenu.links.append(Mod_FullNames_Export())
                 exportMenu.links.append(Mod_Prices_Export())
                 exportMenu.links.append(Mod_Stats_Export())
@@ -526,7 +526,7 @@ def InitModLinks():
             importMenu = MenuLink(_(u"Import"))
             importMenu.links.append(Mod_EditorIds_Import())
             ## importMenu.links.append(Mod_ItemData_Import())
-            if bush.game.fsName == u'Skyrim':
+            if bush.game.fsName == u'Skyrim' or u'Skyrim Special Edition':
                 importMenu.links.append(Mod_FullNames_Import())
                 importMenu.links.append(Mod_Prices_Import())
                 importMenu.links.append(Mod_Stats_Import())
