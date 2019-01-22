@@ -115,12 +115,6 @@ def isPBashMergeable(modInfo, minfos, verbose):
 
 def _is_eslCapable_no_load(modInfo, reasons):
     verbose = reasons is not None
-    if modInfo.header.flags1.esm: # FIXME why not and if not check extension too
-        if not verbose: return False
-        reasons.append(u'\n.    '+_(u'Is esm.'))
-    if modInfo.abs_path.cext == u'.esl':
-        if not verbose: return False
-        reasons.append(u'\n.    ' + _(u'Is .esl file.'))
     #--Bashed Patch
     if modInfo.isBP():
         if not verbose: return False
@@ -146,16 +140,18 @@ def check_esl_topsSkipped(modInfo, reasons=None, modFile=None):
                                     u'qualifications and modify ESL flag.')
     return True
 
-def hasHighForms(modInfo, minfos, verbose):
+def is_esl_capable(modInfo, minfos, verbose):
     """Returns True or error message indicating whether specified mod is
     convertible to a light plugin."""
     reasons = [] if verbose else None
-    eslCapable = _is_eslCapable_no_load(modInfo, reasons)
-    if not verbose and not eslCapable:
-        return False
+    eslCapable = True
+    if modInfo.isBP():
+        if not verbose: return False
+        reasons.append(u'\n.    '+_(u'Is Bashed Patch.'))
+        eslCapable = False
     modFile = ModFile(modInfo, LoadFactory(False, *set(
         recClass.classType for recClass in bush.game.mergeClasses)))
-    eslCapable = check_esl_topsSkipped(modInfo, reasons, modFile)
+    eslCapable |= check_esl_topsSkipped(modInfo, reasons, modFile)
     if not verbose and not eslCapable:
         return False
     if isinstance(reasons, list): # verbose

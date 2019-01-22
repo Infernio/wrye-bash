@@ -31,7 +31,7 @@ from ..brec import ModReader, MreRecord
 from ..cint import ObBaseRecord, ObCollection
 from ..exception import BoltError, CancelError, ModError
 from ..patcher import getPatchesPath, getPatchesList
-from ._mergeability import check_esl_topsSkipped
+from ._mergeability import check_esl_topsSkipped, is_esl_capable
 
 try:
     import loot_api
@@ -396,12 +396,11 @@ class ConfigHelpers:
             #--Mergeable/NoMerge/Deactivate tagged mods
             shouldMerge = self.filesCanBeESLFlagged(modInfos, active)
             if bush.game.check_esl:
-                for m in modInfos.esl_flagged:
-                    if not check_esl_topsSkipped(modInfos[m]):
-                        if modInfos[m].header.flags1.eslFile and m not in modInfos.mergeable:
-                            if not modInfos[m].abs_path.cext in (u'.esm', u'.esl'):
-                                if not (modInfos[m].header.flags1.esm and modInfos[m].header.flags1.eslFile):
-                                        removeEslFlag.add(m)
+                for m, modinf in modInfos.items():
+                    if not modinf.is_esl():
+                        continue # we check .esl extension and ESL flagged mods
+                    if not is_esl_capable(modinf, modInfos, verbose=False):
+                        removeEslFlag.add(m)
             shouldDeactivateA, shouldDeactivateB = [], []
             for x in active:
                 tags = modInfos[x].getBashTags()
@@ -460,8 +459,7 @@ class ConfigHelpers:
                 if removeEslFlag:
                     log.setHeader(u'=== ' + _(u'Remove ESL Flag'))
                     log(_(u'Following mods have an ESL flag, but do not '
-                          u'qualify.These mods have one or more ObjectIDs '
-                          u'that are greater then 0xFFF.'))
+                          u'qualify.'))
                     for mod in sorted(removeEslFlag):
                         log(u'* __' + mod.s + u'__')
             if shouldDeactivateB:

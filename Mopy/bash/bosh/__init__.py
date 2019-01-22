@@ -42,7 +42,7 @@ from collections import OrderedDict
 from functools import wraps, partial
 from itertools import imap
 #--Local
-from ._mergeability import isPBashMergeable, isCBashMergeable, hasHighForms
+from ._mergeability import isPBashMergeable, isCBashMergeable, is_esl_capable
 from .mods_metadata import ConfigHelpers
 from .. import bass, bolt, balt, bush, env, load_order, archives, \
     initialization
@@ -619,9 +619,6 @@ class ModInfo(FileInfo):
                                                               ins, True)
             except struct.error as rex:
                 raise ModError(self.name,u'Struct.error: %s' % rex)
-        if bush.game.fsName in (u'Fallout4', u'Skyrim Special Edition'):
-            if self.is_esl():
-                modInfos.esl_flagged.add(self.name)
         if bush.game.fsName == u'Skyrim Special Edition':
             if tes4_rec_header.form_version != ModReader.recHeader.plugin_form_version:
                 modInfos.sse_form43.add(self.name)
@@ -1650,7 +1647,6 @@ class ModInfos(FileInfos):
         self.new_missing_strings = set() #--Set of new mods with missing .STRINGS files
         self.activeBad = set() #--Set of all mods with bad names that are active
         self.sse_form43 = set()
-        self.esl_flagged = set()
         # sentinel for calculating info sets when needed in gui and patcher
         # code, **after** self is refreshed
         self.__calculate = object()
@@ -1960,7 +1956,7 @@ class ModInfos(FileInfos):
         return newMods
 
     def rescanMergeable(self, names, prog=None, doCBash=None, verbose=False):
-        messagetext = _(u"Check for ObjectIDs >0xFFF") if bush.game.check_esl \
+        messagetext = _(u'Check ESL Qualifications') if bush.game.check_esl \
             else _(u"Mark Mergeable")
         with prog or balt.Progress(_(messagetext) + u' ' * 30) as prog:
             return self._rescanMergeable(names, prog, doCBash, verbose)
@@ -1972,7 +1968,7 @@ class ModInfos(FileInfos):
         elif doCBash and not CBashApi.Enabled:
             doCBash = False
         if bush.game.check_esl:
-            is_mergeable = hasHighForms
+            is_mergeable = is_esl_capable
         elif doCBash:
             is_mergeable = isCBashMergeable
         else:
@@ -1984,7 +1980,7 @@ class ModInfos(FileInfos):
             progress(i,fileName.s)
             if not doCBash and reOblivion.match(fileName.s): continue
             fileInfo = self[fileName]
-            if not bush.game.esp.canBash:
+            if not bush.game.esp.canBash or fileInfo.is_esl(): # do not mark esls as esl capable
                 canMerge = False
             else:
                 try:

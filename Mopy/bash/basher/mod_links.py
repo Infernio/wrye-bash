@@ -859,7 +859,7 @@ class Mod_MarkMergeable(ItemLink):
             self._text = _(u'Check ESL Qualifications')
             self._help = _(
                 u'Scans the selected plugin(s) to determine whether or not '
-                u'there are one or more records with an ObjectID > 0xFFF')
+                u'they can be assigned the esl flag')
         else:
             self._text = _(u'Mark Mergeable (CBash)...') if doCBash else _(
                 u'Mark Mergeable...')
@@ -895,7 +895,7 @@ class Mod_MarkMergeable(ItemLink):
                 u'Not Mergeable')) + u'\n* ' + '\n\n* '.join(no)
         self.window.RefreshUI(redraw=self.selected, refreshSaves=False)
         if message != u'':
-            title_ = _(u'Check for ObjectIDs >0xFFF') if \
+            title_ = _(u'Check ESL Qualifications') if \
                 bush.game.check_esl else _(u'Mark Mergeable')
             self._showWryeLog(message, title=title_)
 
