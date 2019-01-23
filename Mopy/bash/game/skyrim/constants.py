@@ -17070,8 +17070,7 @@ statsTypes = {
         'MISC':('eid', 'weight', 'value'),
         'SLGM':('eid', 'weight', 'value'),
         'WEAP':('eid', 'weight', 'value', 'damage', 'speed', 'reach',
-                'enchantPoints', 'stagger', 'critDamage','criticalMultiplier',
-            ),
+                'enchantPoints', 'stagger','critDamage','criticalMultiplier',),
     }
 statsHeaders = (
     #--Alch
