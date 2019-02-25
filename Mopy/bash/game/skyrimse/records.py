@@ -25,12 +25,11 @@
 imported from skyrim."""
 # Set MelModel in brec, in this case it's identical to the skyrim one
 from ..skyrim.records import MelBounds, MelDestructible, MelVmad
-from ...bass import null1, null2, null3, null4
 from ...bolt import Flags, DataDict
 from ...brec import MelModel # set in Mopy/bash/game/skyrim/records.py
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelString, MelSet, MelFid, MelOptStruct, MelFids, MelBase, \
-    MelStructA, MelLString, MelCountedFidList
+    MelStructA, MelLString, MelCountedFidList, null1, null2, null3, null4
 from ...exception import ModSizeError
 # Those are unused here, but need be in this file as are accessed via it
 from ..skyrim.records import MreHeader, MreGmst

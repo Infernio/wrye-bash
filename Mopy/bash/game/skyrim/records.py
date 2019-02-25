@@ -30,14 +30,14 @@ from .constants import allConditions, fid1Conditions, fid2Conditions, \
     fid5Conditions
 from ... import brec
 from ... import bush
-from ...bass import null1, null2, null3, null4
 from ...bolt import Flags, sio, DataDict, winNewLines, encode, struct_pack, \
     struct_unpack
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
     MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelFidList, \
     MelStructA, MreRecord, MreGmstBase, MelLString, MelCountedFidList, \
-    MelCountedFids, MelSortedFidList, MelStrings, MelMODS
+    MelCountedFids, MelSortedFidList, MelStrings, MelMODS, null1, null2, \
+    null3, null4
 from ...exception import BoltError, ModError, ModSizeError, StateError
 # Set MelModel in brec but only if unset, otherwise we are being imported from
 # fallout4.records

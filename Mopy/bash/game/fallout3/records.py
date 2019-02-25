@@ -30,13 +30,12 @@ import struct
 from operator import attrgetter
 from ... import brec
 from ... import bush
-from ...bass import null1, null2, null3, null4
-from ...bolt import Flags, sio, DataDict, encode, GPath, struct_unpack, \
-    struct_pack
+from ...bolt import Flags, sio, DataDict, GPath, struct_unpack, struct_pack
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MelSet, MelFid, MelNull, MelOptStruct, MelFids, \
     MreHeaderBase, MelBase, MelUnicode, MelFidList, MelStructA, MreRecord, \
-    MreGmstBase, MelStrings, MelFull0, MelTuple, MelMODS
+    MreGmstBase, MelStrings, MelFull0, MelTuple, MelMODS, null1, null2, \
+    null3, null4
 from ...exception import BoltError, ModError, ModSizeError, StateError
 # Set MelModel in brec but only if unset
 if brec.MelModel is None:

@@ -26,13 +26,12 @@ import re
 import struct
 from .constants import allConditions, fid1Conditions, fid2Conditions
 from ... import brec
-from ...bass import null1, null2, null3, null4
 from ...bolt import Flags, sio, DataDict, struct_pack
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
     MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelXpci, \
     MelFull0, MelFidList, MelStructA, MelStrings, MreRecord, MreGmstBase, \
-    MelTuple
+    MelTuple, null1, null2, null3, null4
 from ...bush import genericAVEffects, mgef_school, mgef_basevalue, actorValues
 from ...exception import BoltError, ModError, ModSizeError, StateError
 # Set brec MelModel to the one for Oblivion

@@ -27,13 +27,12 @@ import struct
 # Set MelModel in brec, in this case it's identical to the fallout 3 one
 from ..fallout3.records import MelScrxen, MelOwnership, MelDestructible, \
     MelBipedFlags, MelEffects, MelConditions, MreHasEffects
-from ...bass import null1, null2, null3, null4
 from ...bolt import Flags, GPath
 from ...brec import MelModel # set in Mopy/bash/game/fallout3/records.py
 from ...brec import MelRecord, MelStructs, MelGroups, MelStruct, FID, \
     MelGroup, MelString, MelSet, MelFid, MelNull, MelOptStruct, MelFids, \
     MelBase, MelFidList, MelStructA, MreRecord, MreGmstBase, MelFull0, \
-    MreHeaderBase, MelUnicode
+    MreHeaderBase, MelUnicode, null1, null2, null3, null4
 from ...exception import ModError, ModSizeError
 
 # Those are unused here, but need be in this file as are accessed via it

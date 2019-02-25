@@ -31,12 +31,6 @@ and environment issues - do not modify or imitate (ut)."""
 language = None
 AppVersion = u"307" # must represent a valid float
 
-#--Null strings (for default empty byte arrays)
-null1 = '\x00'
-null2 = null1*2
-null3 = null1*3
-null4 = null1*4
-
 #--Global dictionaries - do _not_ reassign !
 # Bash's directories - values are absolute Paths - populated in initDirs()
 dirs = {}

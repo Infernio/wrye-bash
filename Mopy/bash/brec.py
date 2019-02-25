@@ -34,7 +34,6 @@ from operator import attrgetter
 
 import bolt
 import exception
-from bass import null1
 from bolt import decode, encode, sio, GPath, struct_pack, struct_unpack
 
 # Util Functions --------------------------------------------------------------
@@ -428,6 +427,12 @@ class ModWriter:
 #------------------------------------------------------------------------------
 # Constants
 FID = 'FID' #--Used by MelStruct classes to indicate fid elements.
+
+#--Null strings (for default empty byte arrays)
+null1 = '\x00'
+null2 = null1*2
+null3 = null1*3
+null4 = null1*4
 
 #------------------------------------------------------------------------------
 class MelObject(object):

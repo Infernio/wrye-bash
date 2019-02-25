@@ -27,8 +27,7 @@ import re
 from ....bolt import GPath, sio, SubProgress, CsvReader
 from ....patcher import getPatchesPath
 from ....parsers import LoadFactory, ModFile
-from ....brec import MreRecord, ModReader
-from ....bass import null4
+from ....brec import MreRecord, ModReader, null4
 # from  bush import  genericAVEffects
 from .... import bush, bosh, load_order
 from ....cint import MGEFCode, FormID
