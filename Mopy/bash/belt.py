@@ -31,7 +31,8 @@ import load_order
 from ScriptParser import error
 import wx
 import wx.wizard as wiz     # wxPython wizard class
-import bosh, balt, bolt, bush
+import bosh, balt, bush
+from bolt_module import output
 from bolt_module.paths import GPath
 from bolt_module.collect import LowerDict
 from balt import vspace, hspace
@@ -1630,4 +1631,4 @@ class WryeParser(ScriptParser.Parser):
     def kwdCancel(self, msg=_(u"No reason given")):
         self.page = PageError(self.parent, _(u'The installer wizard was canceled:'), msg)
 # END -------------------------------------------------------------------------
-bolt.codebox = WryeParser.codebox
+output.codebox = WryeParser.codebox

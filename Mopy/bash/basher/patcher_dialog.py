@@ -30,6 +30,7 @@ import re
 import time
 import wx
 from datetime import timedelta
+
 from . import BashFrame ##: drop this - decouple !
 from .. import bass, bosh, bolt, balt, env, load_order
 from ..balt import StaticText, vSizer, hSizer, hspacer, Link, OkButton, \
@@ -37,6 +38,7 @@ from ..balt import StaticText, vSizer, hSizer, hspacer, Link, OkButton, \
     RevertToSavedButton, RevertButton, hspace, vspace, Resources
 from ..bolt import SubProgress
 from ..bolt_module.paths import GPath, Path
+from ..bolt_module.output import WryeText
 from ..exception import BoltError, CancelError, FileEditError, \
     PluginsFullError, SkipError
 from ..patcher import configIsCBash, exportConfig
@@ -224,7 +226,7 @@ class PatchDialog(balt.Dialog):
                 with readme.open('w',encoding='utf-8') as file:
                     file.write(logValue)
                 #--Convert log/readme to wtxt and show log
-                bolt.WryeText.genHtml(readme,None,docsDir)
+                WryeText.genHtml(readme, None, docsDir)
             else:
                 tempReadmeDir = Path.tempDir().join(u'Docs')
                 tempReadme = tempReadmeDir.join(patch_name.sroot+u'.txt')
@@ -232,7 +234,7 @@ class PatchDialog(balt.Dialog):
                 with tempReadme.open('w',encoding='utf-8-sig') as file:
                     file.write(logValue)
                 #--Convert log/readmeto wtxt
-                bolt.WryeText.genHtml(tempReadme,None,docsDir)
+                WryeText.genHtml(tempReadme, None, docsDir)
                 #--Try moving temp log/readme to Docs dir
                 try:
                     env.shellMove(tempReadmeDir, bass.dirs['mods'],

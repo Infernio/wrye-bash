@@ -26,11 +26,12 @@ import re
 import string
 import wx
 
-from .. import bass, balt, bosh, bolt, load_order
+from .. import bass, balt, bosh, load_order
 from ..balt import TextCtrl, StaticText, vSizer, hSizer, hspacer, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, hspace, \
     vspace, BaltFrame, Resources, HtmlCtrl
 from ..bolt_module.paths import GPath, Path
+from ..bolt_module.output import WryeText
 from ..bosh import omods
 from ..exception import BoltError
 
@@ -222,7 +223,7 @@ class DocBrowser(BaltFrame):
             out.write(self.plainText.GetValue())
         if self.docIsWtxt:
             docsDir = bosh.modInfos.store_dir.join(u'Docs')
-            bolt.WryeText.genHtml(docPath, None, docsDir)
+            WryeText.genHtml(docPath, None, docsDir)
 
     def SetMod(self,modName=None):
         """Sets the mod to show docs for."""
@@ -293,7 +294,7 @@ class DocBrowser(BaltFrame):
             if htmlPath and (
                 not htmlPath.exists() or (docPath.mtime > htmlPath.mtime)):
                 docsDir = bosh.modInfos.store_dir.join(u'Docs')
-                bolt.WryeText.genHtml(docPath,None,docsDir)
+                WryeText.genHtml(docPath, None, docsDir)
             if not editing and htmlPath and htmlPath.exists() \
                     and self.htmlText:
                 self.htmlText.Navigate(htmlPath.s,0x2) #--0x2: Clear History
