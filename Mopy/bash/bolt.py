@@ -41,7 +41,7 @@ from functools import partial
 # Internal
 import bass
 import exception
-from bolt_module.collect import DataDict
+from bolt_module.collect import DataDict, MainFunctions
 from bolt_module.localization import initTranslator
 from bolt_module.paths import GPath, Path
 from bolt_module.unicode_utils import decode
@@ -289,64 +289,6 @@ class Flags(object):
         trueNames = [name for name in self._names if getattr(self,name)]
         trueNames.sort(key = lambda xxx: self._names[xxx])
         return tuple(trueNames)
-
-#------------------------------------------------------------------------------
-class MainFunctions:
-    """Encapsulates a set of functions and/or object instances so that they can
-    be called from the command line with normal command line syntax.
-
-    Functions are called with their arguments. Object instances are called
-    with their method and method arguments. E.g.:
-    * bish bar arg1 arg2 arg3
-    * bish foo.bar arg1 arg2 arg3"""
-
-    def __init__(self):
-        """Initialization."""
-        self.funcs = {}
-
-    def add(self,func,key=None):
-        """Add a callable object.
-        func - A function or class instance.
-        key - Command line invocation for object (defaults to name of func).
-        """
-        key = key or func.__name__
-        self.funcs[key] = func
-        return func
-
-    def main(self):
-        """Main function. Call this in __main__ handler."""
-        #--Get func
-        args = sys.argv[1:]
-        attrs = args.pop(0).split(u'.')
-        key = attrs.pop(0)
-        func = self.funcs.get(key)
-        if not func:
-            msg = _(u"Unknown function/object: %s") % key
-            try: print msg
-            except UnicodeError: print msg.encode('mbcs')
-            return
-        for attr in attrs:
-            func = getattr(func,attr)
-        #--Separate out keywords args
-        keywords = {}
-        argDex = 0
-        reKeyArg  = re.compile(ur'^-(\D\w+)',re.U)
-        reKeyBool = re.compile(ur'^\+(\D\w+)',re.U)
-        while argDex < len(args):
-            arg = args[argDex]
-            if reKeyArg.match(arg):
-                keyword = reKeyArg.match(arg).group(1)
-                value   = args[argDex+1]
-                keywords[keyword] = value
-                del args[argDex:argDex+2]
-            elif reKeyBool.match(arg):
-                keyword = reKeyBool.match(arg).group(1)
-                keywords[keyword] = True
-                del args[argDex]
-            else:
-                argDex += 1
-        #--Apply
-        apply(func,args,keywords)
 
 #--Commands Singleton
 _mainFunctions = MainFunctions()
