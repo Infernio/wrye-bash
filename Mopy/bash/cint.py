@@ -44,7 +44,7 @@ from os.path import exists, join
 try:
     #See if cint is being used by Wrye Bash
     from bolt import CBash as CBashEnabled
-    from bolt import deprint
+    from bolt_module.debugging import deprint
     from bolt_module.paths import GPath, Path
     from bolt_module import unicode_utils
     from bolt_module.unicode_utils import decode as _uni, encode as _enc

@@ -35,12 +35,12 @@ import StringIO
 import struct
 from collections import OrderedDict
 from functools import partial
-from .. import bolt
 from ..bolt import cstrip, unpack_string, unpack_int, unpack_str8, \
     unpack_short, unpack_float, unpack_str16, unpack_byte, struct_pack, \
     struct_unpack, unpack_int_delim, unpack_str16_delim, unpack_byte_delim, \
     unpack_many
 from ..bolt_module import unicode_utils
+from ..bolt_module.debugging import deprint
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode
 from ..exception import SaveHeaderError, raise_bolt_error
@@ -63,7 +63,7 @@ class SaveFileHeader(object):
                 self.load_header(ins)
         #--Errors
         except (OSError, struct.error, OverflowError):
-            bolt.deprint(u'Failed to read %s' % save_path, traceback=True)
+            deprint(u'Failed to read %s' % save_path, traceback=True)
             raise_bolt_error(u'Failed to read %s' % save_path, SaveHeaderError)
 
     def load_header(self, ins):

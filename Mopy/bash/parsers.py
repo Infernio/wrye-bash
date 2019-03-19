@@ -37,8 +37,9 @@ import bosh # for modInfos
 import env
 import load_order
 from balt import Progress
-from bolt import deprint, CsvReader, csvFormat, struct_pack, struct_unpack
+from bolt import CsvReader, csvFormat, struct_pack, struct_unpack
 from bolt_module import output
+from bolt_module.debugging import deprint
 from bolt_module.output import SubProgress
 from bolt_module.paths import GPath
 from bolt_module.unicode_utils import decode

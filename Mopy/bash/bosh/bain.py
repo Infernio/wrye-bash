@@ -42,9 +42,10 @@ from .. import balt # YAK!
 from .. import bush, bass, bolt, env, archives
 from ..archives import readExts, defaultExt, list_archive, compress7z, \
     extract7z, compressionSettings
-from ..bolt import deprint, formatInteger, round_size, sio
+from ..bolt import formatInteger, round_size, sio
 from ..bolt_module import output
 from ..bolt_module.collect import CIstr, DefaultLowerDict, LowerDict
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import LogFile, SubProgress
 from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \

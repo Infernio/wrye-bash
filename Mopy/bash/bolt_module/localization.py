@@ -32,6 +32,7 @@ import subprocess
 import sys
 import traceback
 
+from .debugging import deprint
 from .unicode_utils import decode
 from .paths import GPath, Path
 
@@ -160,8 +161,6 @@ def initTranslator(lang=None, path=None):
             lang = locale.getlocale()[0].split('_', 1)[0]
             lang = decode(lang)
         except UnicodeError:
-            # TODO(inf) BOLT_MODULE: Move to regular import once done
-            from bolt import deprint
             deprint(u'Still unicode problems detecting locale:', repr(locale.getlocale()),traceback=True)
             # Default to English
             lang = u'English'

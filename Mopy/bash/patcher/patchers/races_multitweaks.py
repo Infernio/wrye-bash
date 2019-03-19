@@ -35,7 +35,7 @@ from collections import defaultdict
 # Internal
 from ... import bush # for defaultEyes (?)
 from ... import bosh # for modInfos
-from ...bolt import deprint
+from ...bolt_module.debugging import deprint
 from ...bolt_module.output import SubProgress
 from ...bolt_module.paths import GPath
 from ...brec import MreRecord, MelObject, strFid

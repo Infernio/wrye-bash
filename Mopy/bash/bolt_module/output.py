@@ -25,10 +25,10 @@
 several ways (e.g. text output, progress bar backends, etc.)."""
 import re
 
-from .paths import Path, GPath
-
+from .debugging import deprint
 # TODO(inf) Have to use absolute import here, relative crashes - why?
 from exception import ArgumentError, BoltError
+from .paths import Path, GPath
 
 class Log:
     """Log Callable. This is the abstract/null version. Useful version should
@@ -115,8 +115,6 @@ class Progress:
         """Update progress with current state. Progress is state/full."""
         if (1.0*self.full) == 0: raise ArgumentError(u'Full must be non-zero!')
         if message: self.message = message
-        # TODO(inf) BOLT_MODULE: Move to regular import once done
-        from bolt import deprint
         if self.debug: deprint(u'%0.3f %s' % (1.0*state/self.full, self.message))
         self._do_progress(1.0 * state / self.full, self.message)
         self.state = state

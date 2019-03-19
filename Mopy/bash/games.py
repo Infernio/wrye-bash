@@ -36,6 +36,7 @@ from collections import defaultdict
 import bass
 import bolt
 from bolt_module import unicode_utils
+from bolt_module.debugging import deprint
 from bolt_module.paths import GPath, Path
 import env
 import exception
@@ -61,8 +62,8 @@ def __write_plugins(out, lord, active, _star):
             out.write(asterisk() + unicode_utils.encode(mod.s, firstEncoding='cp1252'))
             out.write('\r\n')
         except UnicodeEncodeError:
-            bolt.deprint(mod.s + u' failed to properly encode and was not '
-                                 u'included in plugins.txt')
+            deprint(mod.s + u' failed to properly encode and was not included '
+                            u'in plugins.txt')
 
 _re_plugins_txt_comment = re.compile(u'^#.*', re.U)
 def _parse_plugins_txt_(path, mod_infos, _star):
@@ -92,7 +93,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
             try:
                 test = unicode_utils.decode(modname, encoding='cp1252')
             except UnicodeError:
-                bolt.deprint(u'%r failed to properly decode' % modname)
+                deprint(u'%r failed to properly decode' % modname)
                 continue
             if GPath(test) not in mod_infos:
                 # The automatic encoding detector could have returned
@@ -158,7 +159,7 @@ class FixInfo(object):
             self.lo_reordered[1], u'\nto:\n', joint=u'\n')
         msg = u'Fixed Load Order: added(%s), removed(%s), %sreordered %s' % (
             added, removed, duplicates, reordered)
-        bolt.deprint(msg)
+        deprint(msg)
 
     def warn_active(self):
         if not self.act_header: return
@@ -183,7 +184,7 @@ class FixInfo(object):
             msg += u'Reordered active plugins with fixed order '
             msg += _pl(self.act_reordered[0], u'from:\n', joint=u'\n')
             msg += _pl(self.act_reordered[1], u'\nto:\n', joint=u'\n')
-        bolt.deprint(msg)
+        deprint(msg)
 
 class Game(object):
 
@@ -401,8 +402,7 @@ class Game(object):
                     u'%s is missing or corrupted' % master_name)
             fix_lo.lo_added = {master_name}
         if master_dex > 0:
-            bolt.deprint(
-                u'%s has index %d (must be 0)' % (master_name, master_dex))
+            deprint(u'%s has index %d (must be 0)' % (master_name, master_dex))
             lord.remove(master_name)
             lord.insert(0, master_name)
             fix_lo.lo_reordered = True
@@ -426,7 +426,7 @@ class Game(object):
                     lord.insert(index_first_esp, mod)
                 else:
                     lord.insert(0, master_name)
-                    bolt.deprint(u'%s inserted to Load order' % master_name)
+                    deprint(u'%s inserted to Load order' % master_name)
                 index_first_esp += 1
             else: lord.append(mod)
         # end textfile get
@@ -608,8 +608,8 @@ class TimestampGame(Game):
         super(TimestampGame, self)._fix_load_order(lord, fix_lo)
         if fix_lo is not None and fix_lo.lo_added:
             # should not occur, except if undoing
-            bolt.deprint(u'Incomplete load order passed in to set_load_order. '
-                u'Missing: ' + u', '.join(x.s for x in fix_lo.lo_added))
+            deprint(u'Incomplete load order passed in to set_load_order. '
+                    u'Missing: ' + u', '.join(x.s for x in fix_lo.lo_added))
             lord[:] = self.__calculate_mtime_order(mods=lord)
 
 class TextfileGame(Game):
@@ -660,12 +660,12 @@ class TextfileGame(Game):
             mods = cached_active or []
             if cached_active is not None and not self.plugins_txt_path.exists():
                 self._write_plugins_txt(cached_active, cached_active)
-                bolt.deprint(
-                    u'Created %s based on cached info' % self.plugins_txt_path)
+                deprint(u'Created %s based on cached info' %
+                        self.plugins_txt_path)
             elif cached_active is None and self.plugins_txt_path.exists():
                 mods = self._fetch_active_plugins() # will add Skyrim.esm
             self._persist_load_order(mods, mods)
-            bolt.deprint(u'Created %s' % self.loadorder_txt_path)
+            deprint(u'Created %s' % self.loadorder_txt_path)
             return mods
         #--Read file
         _acti, lo = self._parse_modfile(self.loadorder_txt_path)
@@ -695,8 +695,8 @@ class TextfileGame(Game):
             lo.sort(key=w.get)
             if lo != fetched_lo:
                 self._persist_load_order(lo, lo)
-                bolt.deprint(u'Corrected %s (order of mods differed from '
-                             u'their order in %s)' % (
+                deprint(u'Corrected %s (order of mods differed from their '
+                        u'order in %s)' % (
                         self.loadorder_txt_path, self.plugins_txt_path))
         self.__update_lo_cache_info()
         return lo
@@ -706,8 +706,8 @@ class TextfileGame(Game):
         if self.master_path in acti:
             acti.remove(self.master_path)
             self._write_plugins_txt(acti, acti)
-            bolt.deprint(u'Removed %s from %s' % (
-                self.master_path, self.plugins_txt_path))
+            deprint(u'Removed %s from %s' % (self.master_path,
+                                             self.plugins_txt_path))
         acti.insert(0, self.master_path)
         return acti
 
@@ -781,7 +781,7 @@ class AsteriskGame(Game):
             msg = u'Created %s' if not exists else (u'Removed ' + u' ,'.join(
                 map(unicode, to_drop)) + u' from %s')
             self._persist_load_order(lo, active)
-            bolt.deprint(msg % self.plugins_txt_path)
+            deprint(msg % self.plugins_txt_path)
         return lo, active
 
     def _persist_load_order(self, lord, active):
@@ -855,7 +855,7 @@ class AsteriskGame(Game):
                 cls.must_be_active_if_present += tuple(lines)
         except (OSError, IOError) as e:
             if e.errno != errno.ENOENT:
-                bolt.deprint(u'Failed to open %s' % _ccc_path, traceback=True)
+                deprint(u'Failed to open %s' % _ccc_path, traceback=True)
 
 # AsteriskGame overrides
 class Fallout4(AsteriskGame):
@@ -904,8 +904,9 @@ class SkyrimSE(AsteriskGame):
                 dlc_mtime = self.mod_infos[dlc].mtime
                 if dlc_mtime != master_mtime:
                     self.mod_infos[dlc].setmtime(master_mtime)
-                    bolt.deprint(u'Restamped %s  from %s to %s' % (dlc,
-                    bolt.formatDate(dlc_mtime), bolt.formatDate(master_mtime)))
+                    deprint(u'Restamped %s  from %s to %s' % (
+                        dlc, bolt.formatDate(dlc_mtime),
+                        bolt.formatDate(master_mtime)))
         return add
 
 # Game factory

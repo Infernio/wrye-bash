@@ -29,8 +29,8 @@ from collections import OrderedDict, Counter
 from . import AFile
 from .. import env, bush, balt
 from ..bass import dirs
-from ..bolt import deprint
 from ..bolt_module.collect import CIstr, LowerDict, DefaultLowerDict
+from ..bolt_module.debugging import deprint
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import getbestencoding, decode
 from ..exception import AbstractError, CancelError, SkipError, BoltError

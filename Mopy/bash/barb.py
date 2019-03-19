@@ -46,7 +46,7 @@ import bass # for settings (duh!)
 import bolt
 import initialization
 from bass import dirs, AppVersion
-from bolt import deprint
+from bolt_module.debugging import deprint
 from bolt_module.paths import GPath, Path
 from exception import BoltError, StateError, raise_bolt_error
 
@@ -352,7 +352,7 @@ class RestoreSettings(object):
         if self._timestamped_old is self.__unset:
             return # we did not move bash.ini
         if self._timestamped_old is not None:
-            bolt.deprint(u'Restoring bash.ini')
+            deprint(u'Restoring bash.ini')
             GPath(self._timestamped_old).copyTo(u'bash.ini')
         elif self._bash_ini_path:
             # remove bash.ini as it is the one from the backup

@@ -30,6 +30,7 @@ import wx
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
 from ..balt import fill, StaticText, vSizer, checkBox, Button, hsbSizer, \
     Links, SeparatorLink, CheckLink, Link, vspace, VSizer
+from ..bolt_module.debugging import deprint
 from ..bolt_module.paths import GPath
 from ..patcher import patch_files
 
@@ -732,8 +733,8 @@ class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
                 self.gTweakList.Check(index, tweakie.isEnabled)
                 self.gTweakList.SetString(index, tweakie.getListLabel())
             except KeyError: pass # no such key don't spam the log
-            except: bolt.deprint(_(u'Error importing Bashed patch '
-                u'configuration. Item %s skipped.') % tweakie, traceback=True)
+            except: deprint(_(u'Error importing Bashed patch configuration. '
+                              u'Item %s skipped.') % tweakie, traceback=True)
 
 #------------------------------------------------------------------------------
 class _DoublePatcherPanel(_TweakPatcherPanel, _ListPatcherPanel):

@@ -26,7 +26,8 @@ import re
 import subprocess
 
 import bass
-from bolt import startupinfo, deprint, walkdir
+from bolt import startupinfo, walkdir
+from bolt_module.debugging import deprint
 from bolt_module.paths import GPath
 from exception import StateError
 

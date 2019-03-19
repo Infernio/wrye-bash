@@ -27,8 +27,9 @@ import re
 
 from ._mergeability import is_esl_capable
 from .. import balt, bush, bass, load_order
-from ..bolt import deprint, sio, struct_pack, struct_unpack
+from ..bolt import sio, struct_pack, struct_unpack
 from ..bolt_module import output
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import LogFile, SubProgress
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode

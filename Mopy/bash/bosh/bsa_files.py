@@ -40,8 +40,9 @@ from functools import partial
 from itertools import groupby, imap
 from operator import itemgetter
 from . import AFile
-from ..bolt import deprint, struct_pack, struct_unpack, unpack_byte, \
+from ..bolt import struct_pack, struct_unpack, unpack_byte, \
     unpack_string, unpack_int
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import Progress
 from ..exception import BSAError, BSADecodingError, BSAFlagError, \
     BSANotImplemented

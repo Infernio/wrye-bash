@@ -26,10 +26,10 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 #
+import subprocess
 
 from ctypes import *
-from bolt import deprint
-import subprocess
+from bolt_module.debugging import deprint
 
 try:
     from ctypes.wintypes import MAX_PATH

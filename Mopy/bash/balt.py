@@ -29,9 +29,9 @@ import bass # for dirs - try to avoid
 #--Localization
 #..Handled by bolt, so import that.
 import bolt
-from bolt import deprint
 from bolt_module import output
 from bolt_module.collect import Settings
+from bolt_module.debugging import deprint
 from bolt_module.paths import GPath, Path
 from bolt_module.output import WryeText
 from exception import AbstractError, AccessDeniedError, ArgumentError, \

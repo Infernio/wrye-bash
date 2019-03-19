@@ -49,9 +49,9 @@ from .. import bass, bolt, balt, bush, env, load_order, archives, \
 from .. import patcher # for configIsCBash()
 from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
-from ..bolt import deprint, sio, struct_pack, \
-    struct_unpack
+from ..bolt import sio, struct_pack, struct_unpack
 from ..bolt_module.collect import DataDict, LowerDict, Settings
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath, Path
 from ..bolt_module.unicode_utils import decode

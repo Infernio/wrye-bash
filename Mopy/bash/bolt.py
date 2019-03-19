@@ -35,14 +35,14 @@ import struct
 import subprocess
 import sys
 import time
-import traceback
 from functools import partial
 # Internal
 import bass
 import exception
 from bolt_module.collect import DataDict, MainFunctions
+from bolt_module.debugging import deprint
 from bolt_module.localization import initTranslator
-from bolt_module.paths import GPath, Path
+from bolt_module.paths import GPath
 from bolt_module.output import WryeText, Progress, SubProgress
 from bolt_module.unicode_utils import decode
 
@@ -575,60 +575,6 @@ def csvFormat(format):
         elif char in u'fd': csvFormat += u',%f'
         elif char in u's': csvFormat += u',"%s"'
     return csvFormat[1:] #--Chop leading comma
-
-deprintOn = False
-
-class tempDebugMode(object):
-    __slots__= '_old'
-    def __init__(self):
-        global deprintOn
-        self._old = deprintOn
-        deprintOn = True
-
-    def __enter__(self): return self
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        global deprintOn
-        deprintOn = self._old
-
-import inspect
-def deprint(*args,**keyargs):
-    """Prints message along with file and line location."""
-    if not deprintOn and not keyargs.get('on'): return
-
-    if keyargs.get('trace', True):
-        stack = inspect.stack()
-        file_, line, function = stack[1][1:4]
-        msg = u'%s %4d %s: ' % (GPath(file_).tail.s, line, function)
-    else:
-        msg = u''
-
-    try:
-        msg += u' '.join([u'%s'%x for x in args]) # OK, even with unicode args
-    except UnicodeError:
-        # If the args failed to convert to unicode for some reason
-        # we still want the message displayed any way we can
-        for x in args:
-            try:
-                msg += u' %s' % x
-            except UnicodeError:
-                msg += u' %s' % repr(x)
-
-    if keyargs.get('traceback',False):
-        o = StringIO.StringIO()
-        traceback.print_exc(file=o)
-        value = o.getvalue()
-        try:
-            msg += u'\n%s' % unicode(value, 'utf-8')
-        except UnicodeError:
-            traceback.print_exc()
-            msg += u'\n%s' % repr(value)
-        o.close()
-    try:
-        # Should work if stdout/stderr is going to wxPython output
-        print msg
-    except UnicodeError:
-        # Nope, it's going somewhere else
-        print msg.encode(Path.sys_fs_enc)
 
 def getMatch(reMatch,group=0):
     """Returns the match or an empty string."""

@@ -29,8 +29,9 @@ from itertools import starmap, repeat
 from operator import attrgetter
 
 from .. import bush
-from ..bolt import Flags, sio, deprint, cstrip, unpack_byte, unpack_str8, \
+from ..bolt import Flags, sio, cstrip, unpack_byte, unpack_str8, \
     unpack_many, unpack_int, unpack_short, struct_pack, struct_unpack
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import Log, Progress, SubProgress
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode, encode

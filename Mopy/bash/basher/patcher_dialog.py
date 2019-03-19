@@ -36,6 +36,7 @@ from .. import bass, bosh, bolt, balt, env, load_order
 from ..balt import StaticText, vSizer, hSizer, hspacer, Link, OkButton, \
     SelectAllButton, CancelButton, SaveAsButton, OpenButton, \
     RevertToSavedButton, RevertButton, hspace, vspace, Resources
+from ..bolt_module.debugging import deprint
 from ..bolt_module.output import LogFile, WryeText, SubProgress
 from ..bolt_module.paths import GPath, Path
 from ..exception import BoltError, CancelError, FileEditError, \
@@ -289,8 +290,8 @@ class PatchDialog(balt.Dialog):
             if self.doCBash:
                 try: patchFile.Current.Close()
                 except:
-                    bolt.deprint(u'Failed to close CBash collection',
-                                 traceback=True)
+                    deprint(u'Failed to close CBash collection',
+                            traceback=True)
             if progress: progress.Destroy()
 
     def _save_pbash(self, patchFile, patch_name):

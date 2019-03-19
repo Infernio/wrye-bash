@@ -36,7 +36,7 @@ import bolt
 import exception
 from bass import null1
 from bolt import sio, struct_pack, struct_unpack
-from bolt_module import unicode_utils
+from bolt_module import debugging, unicode_utils
 from bolt_module.paths import GPath
 from bolt_module.unicode_utils import decode, encode
 
@@ -1244,7 +1244,7 @@ class MelSet:
             try:
                 element.dumpData(record,out)
             except:
-                bolt.deprint('error dumping data:',traceback=True)
+                debugging.deprint('error dumping data:', traceback=True)
                 print u'Dumping:',getattr(record,'eid',u'<<NO EID>>'),record.fid,element
                 for attr in record.__slots__:
                     if hasattr(record,attr):
@@ -1771,10 +1771,10 @@ class MreGmstBase(MelRecord):
                 with open(fname) as pkl_file:
                     cls.Ids = cPickle.load(pkl_file)[cls.classType]
             except:
-                old = bolt.deprintOn
-                bolt.deprintOn = True
-                bolt.deprint(u'Error loading %s:' % fname, traceback=True)
-                bolt.deprintOn = old
+                old = debugging.deprintOn
+                debugging.deprintOn = True
+                debugging.deprint(u'Error loading %s:' % fname, traceback=True)
+                debugging.deprintOn = old
                 raise
         return bosh.modInfos.masterName,cls.Ids[self.eid]
 

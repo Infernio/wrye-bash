@@ -207,7 +207,9 @@ def _main(opts):
     import barg
     bass.sys_argv = barg.convert_to_long_options(sys.argv)
     import env # env imports bolt (this needs fixing)
-    bolt.deprintOn = opts.debug
+    # TODO(inf) BOLT_MODULE: This needs revising once done
+    from bolt_module import debugging
+    debugging.deprintOn = opts.debug
     # useful for understanding context of bug reports
     if opts.debug or is_standalone:
         # Standalone stdout is NUL no matter what.   Redirect it to stderr.

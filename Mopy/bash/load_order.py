@@ -48,6 +48,7 @@ import time
 import balt
 import bass
 import bolt
+from bolt_module.debugging import deprint
 from bolt_module.paths import Path
 import bush
 import exception
@@ -255,7 +256,7 @@ def _update_cache(lord=None, acti_sorted=None, __index_move=0):
         fix_lo.lo_deprint()
         cached_lord = LoadOrder(lord, acti_sorted)
     except Exception:
-        bolt.deprint(u'Error updating load_order cache')
+        deprint(u'Error updating load_order cache')
         cached_lord = __empty
         raise
     finally:
@@ -291,8 +292,8 @@ def refresh_lo(cached=False, cached_active=True):
             list(saved.loadOrder), list(saved.activeOrdered), dry_run=True)
         fixed = LoadOrder(lord, acti)
         if fixed != saved:
-            bolt.deprint(u'Saved load order is no longer valid: %s'
-                         u'\nCorrected to %s' % (saved, fixed))
+            deprint(u'Saved load order is no longer valid: %s\nCorrected to '
+                    u'%s' % (saved, fixed))
         saved = fixed
     else: saved = None
     if cached_lord is not __empty:

@@ -2595,7 +2595,7 @@ class Mod_ItemData_Import(_Mod_Import_Link): # CRUFT
             self._showLog(buff.getvalue())
 
 #------------------------------------------------------------------------------
-from ..bolt import deprint
+from ..bolt_module.debugging import deprint
 from ..cint import ObCollection
 
 class MasterList_AddMasters(ItemLink): # CRUFT
