@@ -32,7 +32,8 @@ from .. import load_order
 from .. import bass
 from ..parsers import LoadFactory, ModFile, MasterSet
 from ..brec import MreRecord
-from ..bolt import SubProgress, deprint, Progress
+from ..bolt import deprint
+from ..bolt_module.output import Progress, SubProgress
 from ..bolt_module.paths import GPath, Path
 from ..cint import ObModFile, FormID, dump_record, ObCollection, MGEFCode
 from ..exception import AbstractError, BoltError, CancelError, ModError, \

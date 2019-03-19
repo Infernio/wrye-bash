@@ -67,9 +67,10 @@ import wx
 
 #--Local
 from .. import bush, bosh, bolt, bass, env, load_order, archives
-from ..bolt import SubProgress, deprint, formatInteger, formatDate, \
+from ..bolt import deprint, formatInteger, formatDate, \
     round_size
-from ..bolt_module import paths
+from ..bolt_module import paths, output
+from ..bolt_module.output import SubProgress
 from ..bolt_module.paths import GPath
 from ..bosh import omods
 from ..cint import CBashApi
@@ -4086,7 +4087,7 @@ class BashApp(wx.App):
         if settings['bash.version'] != bass.AppVersion:
             settings['bash.version'] = bass.AppVersion
             # rescan mergeability on version upgrade to detect new mergeable
-            bosh.modInfos.rescanMergeable(bosh.modInfos.data, bolt.Progress())
+            bosh.modInfos.rescanMergeable(bosh.modInfos.data, output.Progress())
         settings['bash.CBashEnabled'] = CBashApi.Enabled
 
 # Initialization --------------------------------------------------------------

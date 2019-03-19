@@ -28,7 +28,7 @@ import re
 from .paths import Path, GPath
 
 # TODO(inf) Have to use absolute import here, relative crashes - why?
-from exception import BoltError
+from exception import ArgumentError, BoltError
 
 class Log:
     """Log Callable. This is the abstract/null version. Useful version should
@@ -88,6 +88,69 @@ class LogFile(Log):
     def writeMessage(self,message,appendNewline):
         self.out.write(message)
         if appendNewline: self.out.write(u'\n')
+
+class Progress:
+    """Progress Callable: Shows progress when called."""
+    def __init__(self,full=1.0):
+        if (1.0*full) == 0: raise ArgumentError(u'Full must be non-zero!')
+        self.message = u''
+        self.full = 1.0 * full
+        self.state = 0
+        self.debug = False
+
+    def getParent(self):
+        return None
+
+    def setFull(self,full):
+        """Set's full and for convenience, returns self."""
+        if (1.0*full) == 0: raise ArgumentError(u'Full must be non-zero!')
+        self.full = 1.0 * full
+        return self
+
+    def plus(self,increment=1):
+        """Increments progress by 1."""
+        self.__call__(self.state+increment)
+
+    def __call__(self,state,message=''):
+        """Update progress with current state. Progress is state/full."""
+        if (1.0*self.full) == 0: raise ArgumentError(u'Full must be non-zero!')
+        if message: self.message = message
+        # TODO(inf) BOLT_MODULE: Move to regular import once done
+        from bolt import deprint
+        if self.debug: deprint(u'%0.3f %s' % (1.0*state/self.full, self.message))
+        self._do_progress(1.0 * state / self.full, self.message)
+        self.state = state
+
+    def _do_progress(self, state, message):
+        """Default _do_progress does nothing."""
+
+    # __enter__ and __exit__ for use with the 'with' statement
+    def __enter__(self): return self
+    def __exit__(self, exc_type, exc_value, exc_traceback): pass
+
+class SubProgress(Progress):
+    """Sub progress goes from base to ceiling."""
+    def __init__(self,parent,baseFrom=0.0,baseTo='+1',full=1.0,silent=False):
+        """For creating a subprogress of another progress meter.
+        progress: parent (base) progress meter
+        baseFrom: Base progress when this progress == 0.
+        baseTo: Base progress when this progress == full
+          Usually a number. But string '+1' sets it to baseFrom + 1
+        full: Full meter by this progress' scale."""
+        Progress.__init__(self,full)
+        if baseTo == '+1': baseTo = baseFrom + 1
+        if baseFrom < 0 or baseFrom >= baseTo:
+            raise ArgumentError(u'BaseFrom must be >= 0 and BaseTo must be > BaseFrom')
+        self.parent = parent
+        self.baseFrom = baseFrom
+        self.scale = 1.0*(baseTo-baseFrom)
+        self.silent = silent
+
+    def __call__(self,state,message=u''):
+        """Update progress with current state. Progress is state/full."""
+        if self.silent: message = u''
+        self.parent(self.baseFrom+self.scale*state/self.full,message)
+        self.state = state
 
 codebox = None
 class WryeText:

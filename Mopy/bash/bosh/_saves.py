@@ -28,11 +28,10 @@ coded for rest of the games."""
 from itertools import starmap, repeat
 from operator import attrgetter
 
-from .. import bolt, bush
-from ..bolt import Flags, sio, deprint, cstrip, \
-    SubProgress, unpack_byte, unpack_str8, unpack_many, unpack_int, \
-    unpack_short, struct_pack, struct_unpack
-from ..bolt_module.output import Log
+from .. import bush
+from ..bolt import Flags, sio, deprint, cstrip, unpack_byte, unpack_str8, \
+    unpack_many, unpack_int, unpack_short, struct_pack, struct_unpack
+from ..bolt_module.output import Log, Progress, SubProgress
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode, encode
 from ..brec import ModReader, MreRecord, ModWriter, getObjectIndex, \
@@ -356,7 +355,7 @@ class SaveFile:
         path = self.fileInfo.getPath()
         with open(path.s,'rb') as ins:
             #--Progress
-            progress = progress or bolt.Progress()
+            progress = progress or Progress()
             progress.setFull(self.fileInfo.size)
             #--Header
             progress(0,_(u'Reading Header.'))
@@ -441,7 +440,7 @@ class SaveFile:
             def _pack(fmt, *data):
                 out.write(struct_pack(fmt, *data))
             #--Progress
-            progress = progress or bolt.Progress()
+            progress = progress or Progress()
             progress.setFull(self.fileInfo.size)
             #--Header
             progress(0,_(u'Writing Header.'))
@@ -710,7 +709,7 @@ class SaveFile:
         """Analyzes file for bloating. Returns (createdCounts,nullRefCount)."""
         nullRefCount = 0
         createdCounts = {}
-        progress = progress or bolt.Progress()
+        progress = progress or Progress()
         progress.setFull(len(self.created)+len(self.records))
         #--Created objects
         progress(0,_(u'Scanning created objects'))
@@ -744,7 +743,7 @@ class SaveFile:
     def removeBloating(self,uncreateKeys,removeNullRefs=True,progress=None):
         """Removes duplicated created items and null refs."""
         numUncreated = numUnCreChanged = numUnNulled = 0
-        progress = progress or bolt.Progress()
+        progress = progress or Progress()
         progress.setFull((len(uncreateKeys) and len(self.created))+len(self.records))
         uncreated = set()
         #--Uncreate
@@ -822,7 +821,7 @@ class SaveSpells:
 
     def load(self, modInfos, progress=None):
         """Load savegame and extract created spells from it and its masters."""
-        progress = progress or bolt.Progress()
+        progress = progress or Progress()
         saveFile = self.saveFile = SaveFile(self.saveInfo)
         saveFile.load(SubProgress(progress,0,0.4))
         progress = SubProgress(progress,0.4,1.0,len(saveFile.masters)+1)
@@ -909,7 +908,7 @@ class SaveEnchantments:
 
     def load(self,progress=None):
         """Loads savegame and and extracts created enchantments from it."""
-        progress = progress or bolt.Progress()
+        progress = progress or Progress()
         saveFile = self.saveFile = SaveFile(self.saveInfo)
         saveFile.load(SubProgress(progress,0,0.4))
         #--Extract created enchantments

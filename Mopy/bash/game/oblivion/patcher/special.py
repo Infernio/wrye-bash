@@ -24,8 +24,9 @@
 import collections
 import os
 import re
-from ....bolt import sio, SubProgress, CsvReader
-from bolt_module.paths import GPath
+from ....bolt import sio, CsvReader
+from ....bolt_module.output import SubProgress
+from ....bolt_module.paths import GPath
 from ....patcher import getPatchesPath
 from ....parsers import LoadFactory, ModFile
 from ....brec import MreRecord, ModReader

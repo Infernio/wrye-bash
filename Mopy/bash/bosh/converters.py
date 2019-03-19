@@ -30,8 +30,9 @@ import sys
 from .. import bolt, archives, bass
 from ..archives import defaultExt, readExts, compressionSettings, \
     compressCommand
-from ..bolt import PickleDict, sio, SubProgress
+from ..bolt import PickleDict, sio
 from ..bolt_module.collect import DataDict
+from ..bolt_module.output import SubProgress, Progress
 from ..bolt_module.paths import GPath, Path
 from ..exception import ArgumentError, StateError
 
@@ -98,7 +99,7 @@ class ConvertersData(DataDict):
 
     def refreshConverters(self, progress=None, fullRefresh=False):
         """Refresh converter status, and move duplicate BCFs out of the way."""
-        progress = progress or bolt.Progress()
+        progress = progress or Progress()
         pending = set()
         bcfCRC_converter = self.bcfCRC_converter
         convJoin = converters_dir.join
@@ -428,7 +429,7 @@ class InstallerConverter(object):
     def build(self, srcArchives, idata, destArchive, BCFArchive, blockSize,
               progress=None, crc_installer=None):
         """Builds and packages a BCF"""
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else Progress()
         #--Initialization
         bass.rmTempDir()
         srcFiles = {}

@@ -26,9 +26,10 @@ import os
 import re
 
 from ._mergeability import is_esl_capable
-from .. import balt, bolt, bush, bass, load_order
+from .. import balt, bush, bass, load_order
 from ..bolt import deprint, sio, struct_pack, struct_unpack
-from ..bolt_module.output import LogFile
+from ..bolt_module import output
+from ..bolt_module.output import LogFile, SubProgress
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode
 from ..brec import ModReader, MreRecord
@@ -640,7 +641,7 @@ class ModCleaner:
         self.udr = set()    # Fids for Deleted Reference records
         self.fog = set()    # Fids for Cells needing the Nvidia Fog Fix
 
-    def scan(self,what=ALL,progress=bolt.Progress(),detailed=False):
+    def scan(self, what=ALL,progress=output.Progress(),detailed=False):
         """Scan this mod for dirty edits.
            return (UDR,ITM,FogFix)"""
         udr,itm,fog = ModCleaner.scan_Many([self.modInfo],what,progress,detailed)[0]
@@ -653,7 +654,7 @@ class ModCleaner:
         return udr,itm,fog
 
     @staticmethod
-    def scan_Many(modInfos,what=DEFAULT,progress=bolt.Progress(),detailed=False):
+    def scan_Many(modInfos,what=DEFAULT,progress=output.Progress(),detailed=False):
         """Scan multiple mods for dirty edits"""
         if len(modInfos) == 0: return []
         if not bass.settings['bash.CBashEnabled']:
@@ -661,7 +662,7 @@ class ModCleaner:
         else:
             return ModCleaner._scan_CBash(modInfos,what,progress)
 
-    def clean(self,what=UDR|FOG,progress=bolt.Progress(),reScan=False):
+    def clean(self,what=UDR|FOG,progress=output.Progress(),reScan=False):
         """reScan:
              True: perform scans before cleaning
              False: only perform scans if itm/udr is empty
@@ -669,7 +670,7 @@ class ModCleaner:
         ModCleaner.clean_Many([self],what,progress,reScan)
 
     @staticmethod
-    def clean_Many(cleaners,what,progress=bolt.Progress(),reScan=False):
+    def clean_Many(cleaners,what,progress=output.Progress(),reScan=False):
         """Accepts either a list of ModInfo's or a list of ModCleaner's"""
         from . import ModInfos
         if isinstance(cleaners[0],ModInfos):
@@ -728,7 +729,7 @@ class ModCleaner:
                     Current.addMod(path.stail)
                 Current.load()
                 #--Scan
-                subprogress1 = bolt.SubProgress(progress,i,i+1)
+                subprogress1 = SubProgress(progress, i, i + 1)
                 subprogress1.setFull(max(len(groupModInfos),1))
                 for j,modInfo in enumerate(groupModInfos):
                     subprogress1(j,_(u'Scanning...') + u'\n' + modInfo.name.s)
@@ -748,7 +749,7 @@ class ModCleaner:
                             if doITM:
                                 itm |= set([x.fid for x in modFile.GetRecordsIdenticalToMaster()])
                             total = len(udrRecords) + len(fogRecords)
-                            subprogress2 = bolt.SubProgress(subprogress1,j,j+1)
+                            subprogress2 = SubProgress(subprogress1, j, j + 1)
                             subprogress2.setFull(max(total,1))
                             #--Scan UDR
                             for record in udrRecords:
@@ -781,7 +782,7 @@ class ModCleaner:
             udr = {}
             parents_to_scan = {}
             if len(modInfo.masterNames) > 0:
-                subprogress = bolt.SubProgress(progress,i,i+1)
+                subprogress = SubProgress(progress, i, i + 1)
                 if detailed:
                     subprogress.setFull(max(modInfo.size*2,1))
                 else:
@@ -929,7 +930,7 @@ class ModCleaner:
                     Current.addMod(path.stail)
                 Current.load()
                 #--Clean
-                subprogress1 = bolt.SubProgress(progress,i,i+1)
+                subprogress1 = SubProgress(progress, i, i + 1)
                 subprogress1.setFull(max(len(groupCleaners),1))
                 for j,cleaner in enumerate(groupCleaners):
                     subprogress1(j,_(u'Cleaning...') + u'\n' + cleaner.modInfo.name.s)
@@ -938,7 +939,7 @@ class ModCleaner:
                     changed = False
                     if modFile:
                         total = sum([len(cleaner.udr)*doUDR,len(cleaner.fog)*doFog,len(cleaner.itm)*doITM])
-                        subprogress2 = bolt.SubProgress(subprogress1,j,j+1)
+                        subprogress2 = SubProgress(subprogress1, j, j + 1)
                         subprogress2.setFull(max(total,1))
                         if doUDR:
                             for udr in cleaner.udr:
@@ -977,7 +978,7 @@ class ModCleaner:
         #--Clean
         for i,cleaner in enumerate(cleaners):
             progress(i,_(u'Cleaning...')+u'\n'+cleaner.modInfo.name.s)
-            subprogress = bolt.SubProgress(progress,i,i+1)
+            subprogress = SubProgress(progress, i, i + 1)
             subprogress.setFull(max(cleaner.modInfo.size,1))
             #--File stream
             path = cleaner.modInfo.getPath()
@@ -1131,7 +1132,7 @@ class ModDetails:
                         u'Mis-sized compressed data. Expected %d, got %d.' % (size,len(decomp)))
                 reader = ModReader(modInfo.name,sio(decomp))
                 return reader,sizeCheck
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         group_records = self.group_records = {}
         records = group_records[bush.game_mod.records.MreHeader.classType] = []
         with ModReader(modInfo.name,modInfo.getPath().open('rb')) as ins:

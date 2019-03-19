@@ -30,6 +30,7 @@ import bass # for dirs - try to avoid
 #..Handled by bolt, so import that.
 import bolt
 from bolt import deprint
+from bolt_module import output
 from bolt_module.collect import Settings
 from bolt_module.paths import GPath, Path
 from bolt_module.output import WryeText
@@ -1334,7 +1335,7 @@ class BusyCursor(object):
         wx.EndBusyCursor()
 
 #------------------------------------------------------------------------------
-class Progress(bolt.Progress):
+class Progress(output.Progress):
     """Progress as progress dialog."""
     _style = wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_SMOOTH
 
@@ -1343,7 +1344,7 @@ class Progress(bolt.Progress):
         if abort: __style |= wx.PD_CAN_ABORT
         if elapsed: __style |= wx.PD_ELAPSED_TIME
         self.dialog = wx.ProgressDialog(title, message, 100, parent, __style)
-        bolt.Progress.__init__(self)
+        output.Progress.__init__(self)
         self.message = message
         self.isDestroyed = False
         self.prevMessage = u''

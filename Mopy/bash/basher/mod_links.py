@@ -39,9 +39,9 @@ from .. import bass, bosh, bolt, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, TextCtrl, toggleButton, vSizer, hspacer, \
     StaticText, CheckLink, EnabledLink, AppendableLink, TransLink, RadioLink, \
     SeparatorLink, ChoiceLink, OneItemLink, Image, ListBoxes, OkButton
-from ..bolt import SubProgress, formatDate
-from ..bolt_module import paths
-from ..bolt_module.output import LogFile
+from ..bolt import formatDate
+from ..bolt_module import paths, output
+from ..bolt_module.output import LogFile, SubProgress
 from ..bolt_module.paths import GPath
 from ..bosh import faces
 from ..cint import CBashApi, FormID
@@ -1589,7 +1589,7 @@ class _Esm_Esl_Flip(EnabledLink):
             # we then need to sync order in skyrim's plugins.txt
             bosh.modInfos.refreshLoadOrder(forceRefresh=True, forceActive=True)
             # converted to esps/esls - rescan mergeable
-            bosh.modInfos.rescanMergeable(updated, bolt.Progress())
+            bosh.modInfos.rescanMergeable(updated, output.Progress())
             # will be moved to the top - note that modification times won't
             # change - so mods will revert to their original position once back
             # to esp from esm (Oblivion etc). Refresh saves due to esms move

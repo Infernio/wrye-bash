@@ -42,10 +42,10 @@ from .. import balt # YAK!
 from .. import bush, bass, bolt, env, archives
 from ..archives import readExts, defaultExt, list_archive, compress7z, \
     extract7z, compressionSettings
-from ..bolt import deprint, formatInteger, round_size, sio, \
-    SubProgress
+from ..bolt import deprint, formatInteger, round_size, sio
+from ..bolt_module import output
 from ..bolt_module.collect import CIstr, DefaultLowerDict, LowerDict
-from ..bolt_module.output import LogFile
+from ..bolt_module.output import LogFile, SubProgress
 from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \
     InstallerArchiveError, SkipError, StateError, FileError
@@ -139,7 +139,7 @@ class Installer(object):
         progress.setFull(pending_size + len(pending))
         for rpFile, (size, _crc, date, asFile) in iter(sorted(pending.items())):
             progress(done, progress_msg + rpFile)
-            sub = bolt.SubProgress(progress, done, done + size + 1)
+            sub = SubProgress(progress, done, done + size + 1)
             sub.setFull(size + 1)
             crc = 0L
             try:
@@ -329,7 +329,7 @@ class Installer(object):
             self.dirty_sizeCrc = LowerDict(('%s' % x, y) for x, y in
                                            self.dirty_sizeCrc.iteritems())
         if rescan:
-            dest_scr = self.refreshBasic(bolt.Progress(),
+            dest_scr = self.refreshBasic(output.Progress(),
                                          recalculate_project_crc=False)
         else:
             dest_scr = self.refreshDataSizeCrc()
@@ -1009,7 +1009,7 @@ class Installer(object):
         for k in dest_src.keys():
             if k not in destFiles: del dest_src[k]
         if not dest_src: return LowerDict(), set(), set()
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else output.Progress()
         return self._install(dest_src, progress)
 
     def _install(self, dest_src, progress):
@@ -1206,7 +1206,7 @@ class InstallerArchive(Installer):
 
     def unpackToProject(self, project, progress=None):
         """Unpacks archive to build directory."""
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         files = bolt.sortFiles([x[0] for x in self.fileSizeCrcs])
         if not files: return 0
         #--Clear Project
@@ -1278,7 +1278,7 @@ class InstallerArchive(Installer):
                                         u'tiff', u'tga', u'iff', u'xpm',
                                         u'ico', u'cur', u'ani',)))
             unpack_dir = self.unpackToTemp(files_to_extract,
-                bolt.SubProgress(progress,0,0.9), recurse=True)
+                SubProgress(progress, 0, 0.9), recurse=True)
         return unpack_dir.join(self.hasWizard)
 
 #------------------------------------------------------------------------------
@@ -1305,7 +1305,7 @@ class InstallerProject(Installer):
         #--Scan for changed files
         apRoot = bass.dirs['installers'].join(self.archive)
         rootName = apRoot.stail
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else output.Progress()
         progress_msg = rootName + u'\n' + _(u'Scanning...')
         progress(0, progress_msg + u'\n')
         progress.setFull(1)
@@ -1560,7 +1560,7 @@ class InstallersData(DataStore):
 
     def irefresh(self, progress=None, what='DIONSC', fullRefresh=False,
                  refresh_info=None, deleted=None, pending=None, projects=None):
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         #--Archive invalidation
         from . import oblivionIni, InstallerMarker, modInfos
         if bass.settings.get('bash.bsaRedirection') and oblivionIni.abs_path.exists():
@@ -1685,7 +1685,7 @@ class InstallersData(DataStore):
         True, triggering the rest of the refreshes in irefresh. Once
         refresh_info is calculated, deleted are removed, refreshBasic is
         called on added/updated files.
-        :type progress: bolt.Progress | None
+        :type progress: output.Progress | None
         :type fullRefresh: bool
         :type refresh_info: InstallersData._RefreshInfo | None
         :type deleted: collections.Iterable[Path] | None
@@ -1694,7 +1694,7 @@ class InstallersData(DataStore):
         """
         # TODO(ut):we need to return the refresh_info for more granular control
         # in irefresh and also add extra processing for deleted files
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         #--Current archives
         if refresh_info is deleted is pending is None:
             refresh_info = self.scan_installers_dir(bass.dirs['installers'].list(),
@@ -1736,7 +1736,7 @@ class InstallersData(DataStore):
         return installer
 
     def applyEmbeddedBCFs(self, installers=None, destArchives=None,
-                          progress=bolt.Progress()):
+                          progress=output.Progress()):
         if installers is None:
             installers = [x for x in self.itervalues() if
                           isinstance(x, InstallerArchive) and x.hasBCF]
@@ -1778,7 +1778,7 @@ class InstallersData(DataStore):
                         position=-1, crc_installer=None):
         try:
             converter.apply(destArchive, crc_installer,
-                            bolt.SubProgress(progress, 0.0, 0.99),
+                            SubProgress(progress, 0.0, 0.99),
                             embedded=installer.crc if installer else 0L)
             #--Add the new archive to Bash
             if destArchive not in self:
@@ -1902,7 +1902,7 @@ class InstallersData(DataStore):
         but not files) specified in Installer global skips and remove empty
         dirs if the setting is on."""
         #--Scan for changed files
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else output.Progress()
         progress_msg = bass.dirs['mods'].stail + u': ' + _(u'Pre-Scanning...')
         progress(0, progress_msg + u'\n')
         progress.setFull(1)
@@ -2059,7 +2059,7 @@ class InstallersData(DataStore):
         root_files.sort(key=itemgetter(0)) # must sort on same key as groupby
         for key, val in groupby(root_files, key=itemgetter(0)):
             root_dirs_files.append((key, [], [j for i, j in val]))
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         new_sizeCrcDate, pending, pending_size = self._process_data_dir(
             root_dirs_files, progress)
         deleted_or_pending = set(dest_paths) - set(new_sizeCrcDate)
@@ -2077,7 +2077,7 @@ class InstallersData(DataStore):
             self.overridden_skips.difference_update(self.data_sizeCrcDate)
             self.__clean_overridden_after_load = False
         new_skips_overrides = self.overridden_skips - set(self.data_sizeCrcDate)
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         progress(0, (
             _(u"%s: Skips overrides...") % bass.dirs['mods'].stail) + u'\n')
         self.update_data_SizeCrcDate(new_skips_overrides, progress)
@@ -2213,7 +2213,7 @@ class InstallersData(DataStore):
                  override=True):
         """Install selected packages. If override is False install only
         missing files. Otherwise, all (unmasked) files."""
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         tweaksCreated = set()
         #--Mask and/or reorder to last
         mask = set()
@@ -2483,7 +2483,7 @@ class InstallersData(DataStore):
         Anneal will:
         * Correct underrides in anPackages.
         * Install missing files from active anPackages."""
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else output.Progress()
         anPackages = (self[package] for package in (anPackages or self.keys()))
         #--Get remove/refresh files from anPackages
         removes = set()

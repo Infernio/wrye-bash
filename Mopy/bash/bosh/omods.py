@@ -25,9 +25,11 @@ import collections
 import re
 import subprocess
 from subprocess import PIPE
-from .. import env, bolt, bass, archives
-from ..bolt import startupinfo, unpack_int_signed, \
-    unpack_byte, unpack_short, unpack_int64_signed, struct_pack
+
+from .. import env, bass, archives
+from ..bolt import startupinfo, unpack_int_signed, unpack_byte, unpack_short, \
+    unpack_int64_signed, struct_pack
+from ..bolt_module.output import Progress, SubProgress
 from ..bolt_module.paths import Path
 from ..bolt_module.unicode_utils import decode, encode
 
@@ -135,7 +137,7 @@ class OmodFile:
 
     def extractToProject(self,outDir,progress=None):
         """Extract the contents of the omod to a project, with omod conversion data"""
-        progress = progress if progress else bolt.Progress()
+        progress = progress if progress else Progress()
         extractDir = stageBaseDir = Path.tempDir()
         stageDir = stageBaseDir.join(outDir.tail)
 
@@ -147,7 +149,7 @@ class OmodFile:
             reExtracting = re.compile(ur'- (.+)',re.U)
             progress(0, self.omod_path.stail + u'\n' + _(u'Extracting...'))
 
-            subprogress = bolt.SubProgress(progress, 0, 0.4)
+            subprogress = SubProgress(progress, 0, 0.4)
             current = 0
             with self.omod_path.unicodeSafe() as tempOmod:
                 cmd7z = [archives.exe7z, u'e', u'-r', u'-sccUTF-8', tempOmod.s, u'-o%s' % extractDir.s, u'-bb1']
@@ -193,13 +195,13 @@ class OmodFile:
 
             pluginSize = sizes.get('plugins',0)
             dataSize = sizes.get('data',0)
-            subprogress = bolt.SubProgress(progress, 0.5, 1)
+            subprogress = SubProgress(progress, 0.5, 1)
             with stageDir.unicodeSafe() as tempOut:
                 if extractDir.join(u'plugins.crc').exists() and extractDir.join(u'plugins').exists():
-                    pluginProgress = bolt.SubProgress(subprogress, 0, float(pluginSize)/(pluginSize+dataSize))
+                    pluginProgress = SubProgress(subprogress, 0, float(pluginSize) / (pluginSize + dataSize))
                     extract(extractDir.join(u'plugins.crc'),extractDir.join(u'plugins'),tempOut,pluginProgress)
                 if extractDir.join(u'data.crc').exists() and extractDir.join(u'data').exists():
-                    dataProgress = bolt.SubProgress(subprogress, subprogress.state, 1)
+                    dataProgress = SubProgress(subprogress, subprogress.state, 1)
                     extract(extractDir.join(u'data.crc'),extractDir.join(u'data'),tempOut,dataProgress)
                 progress(1, self.omod_path.stail + u'\n' + _(u'Extracted'))
 
@@ -227,7 +229,7 @@ class OmodFile:
         # Split the uncompress stream into files
         progress(0.7, self.omod_path.stail + u'\n' + _(u'Unpacking %s') % dataPath.stail)
         self.splitStream(outPath.join(u'a'), outPath, fileNames, sizes,
-                         bolt.SubProgress(progress,0.7,1.0,len(fileNames))
+                         SubProgress(progress, 0.7, 1.0, len(fileNames))
                          )
         progress(1)
 
@@ -251,7 +253,7 @@ class OmodFile:
         totalSize = sum(sizes)
 
         # Extract data stream to an uncompressed stream
-        subprogress = bolt.SubProgress(progress,0,0.3,full=dataPath.size)
+        subprogress = SubProgress(progress, 0, 0.3, full=dataPath.size)
         subprogress(0, self.omod_path.stail + u'\n' + _(u'Unpacking %s') % dataPath.stail)
         with dataPath.open('rb') as ins:
             done = 0
@@ -282,7 +284,7 @@ class OmodFile:
 
         # Split the uncompressed stream into files
         self.splitStream(outPath.join(dataPath.sbody+u'.uncomp'), outPath, fileNames, sizes,
-                         bolt.SubProgress(progress,0.8,1.0,full=len(fileNames))
+                         SubProgress(progress, 0.8, 1.0, full=len(fileNames))
                          )
         progress(1)
 

@@ -37,8 +37,9 @@ import bosh # for modInfos
 import env
 import load_order
 from balt import Progress
-from bolt import deprint, CsvReader, csvFormat, SubProgress, \
-    struct_pack, struct_unpack
+from bolt import deprint, CsvReader, csvFormat, struct_pack, struct_unpack
+from bolt_module import output
+from bolt_module.output import SubProgress
 from bolt_module.paths import GPath
 from bolt_module.unicode_utils import decode
 from bass import dirs, inisettings
@@ -3951,7 +3952,7 @@ class ModFile(object):
 
     def load(self, do_unpack=False, progress=None, loadStrings=True):
         """Load file."""
-        progress = progress or bolt.Progress()
+        progress = progress or output.Progress()
         progress.setFull(1.0)
         with ModReader(self.fileInfo.name,self.fileInfo.getPath().open('rb')) as ins:
             insRecHeader = ins.unpackRecHeader
