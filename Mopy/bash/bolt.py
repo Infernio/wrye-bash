@@ -41,6 +41,7 @@ from functools import partial
 # Internal
 import bass
 import exception
+from bolt_module.collect import OrderedSet
 from bolt_module.localization import initTranslator
 from bolt_module.paths import GPath, Path
 from bolt_module.unicode_utils import decode
@@ -327,34 +328,6 @@ class DataDict(object):
         return self.data.itervalues()
 
 #------------------------------------------------------------------------------
-from collections import MutableSet
-class OrderedSet(list, MutableSet):
-    """A set like object, that remembers the order items were added to it.
-       Since it has order, a few list functions were added as well:
-        - index(value)
-        - __getitem__(index)
-        - __call__ -> to enable 'enumerate'
-       If an item is discarded, then later readded, it will be added
-       to the end of the set.
-    """
-    def update(self, *args, **kwdargs):
-        if kwdargs: raise exception.TypeError("update() takes no keyword arguments")
-        for s in args:
-            for e in s:
-                self.add(e)
-
-    def add(self, elem):
-        if elem not in self:
-            self.append(elem)
-    def discard(self, elem): self.pop(self.index(elem),None)
-    def __or__(self,other):
-        left = OrderedSet(self)
-        left.update(other)
-        return left
-    def __repr__(self): return u'OrderedSet%s' % unicode(list(self))[1:-1]
-    def __unicode__(self): return u'{%s}' % unicode(list(self))[1:-1]
-
-#------------------------------------------------------------------------------
 class MemorySet(object):
     """Specialization of the OrderedSet, where it remembers the order of items
        event if they're removed.  Also, combining and comparing to other MemorySet's
@@ -383,7 +356,7 @@ class MemorySet(object):
             self.mask.append(True)
     def discard(self,elem):
         if elem in self.items: self.mask[self.items.index(elem)] = False
-    discarded = property(lambda self: OrderedSet([x for i,x in enumerate(self.items) if not self.mask[i]]))
+    discarded = property(lambda self: OrderedSet([x for i, x in enumerate(self.items) if not self.mask[i]]))
 
     def __len__(self): return sum(self.mask)
     def __iter__(self):

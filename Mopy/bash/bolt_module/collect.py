@@ -22,7 +22,7 @@
 #
 # =============================================================================
 """Contains useful collections and methods related to them."""
-import collections
+from collections import defaultdict, MutableSet
 from itertools import chain
 
 class CIstr(unicode):
@@ -121,7 +121,7 @@ class LowerDict(dict):
         return '{0}({1})'.format(type(self).__name__,
                                  super(LowerDict, self).__repr__())
 
-class DefaultLowerDict(LowerDict, collections.defaultdict):
+class DefaultLowerDict(LowerDict, defaultdict):
     """LowerDict that inherits from defaultdict."""
     __slots__ = () # no __dict__ - that would be redundant
 
@@ -135,4 +135,30 @@ class DefaultLowerDict(LowerDict, collections.defaultdict):
 
     def __repr__(self):
         return '{0}({1},{2})'.format(type(self).__name__, self.default_factory,
-            super(collections.defaultdict, self).__repr__())
+            super(defaultdict, self).__repr__())
+
+class OrderedSet(list, MutableSet):
+    """A set like object, that remembers the order items were added to it.
+       Since it has order, a few list functions were added as well:
+        - index(value)
+        - __getitem__(index)
+        - __call__ -> to enable 'enumerate'
+       If an item is discarded, then later readded, it will be added
+       to the end of the set.
+    """
+    def update(self, *args, **kwdargs):
+        if kwdargs: raise TypeError("update() takes no keyword arguments")
+        for s in args:
+            for e in s:
+                self.add(e)
+
+    def add(self, elem):
+        if elem not in self:
+            self.append(elem)
+    def discard(self, elem): self.pop(self.index(elem),None)
+    def __or__(self,other):
+        left = OrderedSet(self)
+        left.update(other)
+        return left
+    def __repr__(self): return u'OrderedSet%s' % unicode(list(self))[1:-1]
+    def __unicode__(self): return u'{%s}' % unicode(list(self))[1:-1]
