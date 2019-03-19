@@ -31,9 +31,9 @@ from operator import attrgetter
 from ... import brec
 from ... import bush
 from ...bass import null1, null2, null3, null4
-from ...bolt import Flags, sio, DataDict, struct_unpack, \
-    struct_pack
-from bolt_module.paths import GPath
+from ...bolt import Flags, sio, struct_unpack, struct_pack
+from ...bolt_module.collect import DataDict
+from ...bolt_module.paths import GPath
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MelSet, MelFid, MelNull, MelOptStruct, MelFids, \
     MreHeaderBase, MelBase, MelUnicode, MelFidList, MelStructA, MreRecord, \

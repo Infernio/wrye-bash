@@ -30,7 +30,8 @@ import sys
 from .. import bolt, archives, bass
 from ..archives import defaultExt, readExts, compressionSettings, \
     compressCommand
-from ..bolt import DataDict, PickleDict, sio, SubProgress
+from ..bolt import PickleDict, sio, SubProgress
+from ..bolt_module.collect import DataDict
 from ..bolt_module.paths import GPath, Path
 from ..exception import ArgumentError, StateError
 

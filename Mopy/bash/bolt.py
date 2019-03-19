@@ -41,7 +41,7 @@ from functools import partial
 # Internal
 import bass
 import exception
-from bolt_module.collect import OrderedSet
+from bolt_module.collect import OrderedSet, DataDict
 from bolt_module.localization import initTranslator
 from bolt_module.paths import GPath, Path
 from bolt_module.unicode_utils import decode
@@ -289,43 +289,6 @@ class Flags(object):
         trueNames = [name for name in self._names if getattr(self,name)]
         trueNames.sort(key = lambda xxx: self._names[xxx])
         return tuple(trueNames)
-
-#------------------------------------------------------------------------------
-class DataDict(object):
-    """Mixin class that handles dictionary emulation, assuming that
-    dictionary is its 'data' attribute."""
-
-    def __contains__(self,key):
-        return key in self.data
-    def __getitem__(self,key):
-        """Return value for key or raise KeyError if not present."""
-        return self.data[key]
-    def __setitem__(self,key,value):
-        self.data[key] = value
-    def __delitem__(self,key):
-        del self.data[key]
-    def __len__(self):
-        return len(self.data)
-    def setdefault(self,key,default):
-        return self.data.setdefault(key,default)
-    def keys(self):
-        return self.data.keys()
-    def values(self):
-        return self.data.values()
-    def items(self):
-        return self.data.items()
-    def has_key(self,key):
-        return self.data.has_key(key)
-    def get(self,key,default=None):
-        return self.data.get(key,default)
-    def pop(self,key,default=None):
-        return self.data.pop(key,default)
-    def iteritems(self):
-        return self.data.iteritems()
-    def iterkeys(self):
-        return self.data.iterkeys()
-    def itervalues(self):
-        return self.data.itervalues()
 
 #------------------------------------------------------------------------------
 class MemorySet(object):

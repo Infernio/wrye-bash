@@ -27,7 +27,8 @@ import struct
 from .constants import allConditions, fid1Conditions, fid2Conditions
 from ... import brec
 from ...bass import null1, null2, null3, null4
-from ...bolt import Flags, sio, DataDict, struct_pack
+from ...bolt import Flags, sio, struct_pack
+from ...bolt_module.collect import DataDict
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
     MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelXpci, \
