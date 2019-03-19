@@ -26,7 +26,6 @@
 #--Standard
 import StringIO
 import cPickle
-import collections
 import copy
 import csv
 import datetime
@@ -39,13 +38,17 @@ import sys
 import time
 import traceback
 from functools import partial
-from itertools import chain
 # Internal
 import bass
 import exception
 from bolt_module.localization import initTranslator
 from bolt_module.paths import GPath, Path
 from bolt_module.unicode_utils import decode
+
+# Needed for pickle backwards compatibility - these ARE used
+# TODO(inf) Once we drop backwards compatibility with older settings, we could
+# drop these imports too
+from bolt_module.collect import CIstr, LowerDict
 
 # structure aliases, mainly introduced to reduce uses of 'pack' and 'unpack'
 
@@ -111,119 +114,6 @@ if locale.getlocale() == (None,None):
 initTranslator(bass.language)
 
 CBash = 0
-
-# LowStrings ------------------------------------------------------------------
-class CIstr(unicode):
-    """See: http://stackoverflow.com/q/43122096/281545"""
-    __slots__ = ()
-
-    #--Hash/Compare
-    def __hash__(self):
-        return hash(self.lower())
-    def __eq__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() == other.lower()
-        return NotImplemented
-    def __ne__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() != other.lower()
-        return NotImplemented
-    def __lt__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() < other.lower()
-        return NotImplemented
-    def __ge__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() >= other.lower()
-        return NotImplemented
-    def __gt__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() > other.lower()
-        return NotImplemented
-    def __le__(self, other):
-        if isinstance(other, CIstr):
-            return self.lower() <= other.lower()
-        return NotImplemented
-    #--repr
-    def __repr__(self):
-        return '{0}({1})'.format(type(self).__name__,
-                                 super(CIstr, self).__repr__())
-
-def _ci_str(maybe_str):
-    """dict keys can be any hashable object - only call CIstr if str"""
-    return CIstr(maybe_str) if isinstance(maybe_str, basestring) else maybe_str
-
-class LowerDict(dict):
-    """Dictionary that transforms its keys to CIstr instances.
-    See: https://stackoverflow.com/a/43457369/281545
-    """
-    __slots__ = () # no __dict__ - that would be redundant
-
-    @staticmethod # because this doesn't make sense as a global function.
-    def _process_args(mapping=(), **kwargs):
-        if hasattr(mapping, 'iteritems'):
-            mapping = getattr(mapping, 'iteritems')()
-        return ((_ci_str(k), v) for k, v in
-                chain(mapping, getattr(kwargs, 'iteritems')()))
-
-    def __init__(self, mapping=(), **kwargs):
-        # dicts take a mapping or iterable as their optional first argument
-        super(LowerDict, self).__init__(self._process_args(mapping, **kwargs))
-
-    def __getitem__(self, k):
-        return super(LowerDict, self).__getitem__(_ci_str(k))
-
-    def __setitem__(self, k, v):
-        return super(LowerDict, self).__setitem__(_ci_str(k), v)
-
-    def __delitem__(self, k):
-        return super(LowerDict, self).__delitem__(_ci_str(k))
-
-    def copy(self): # don't delegate w/ super - dict.copy() -> dict :(
-        return type(self)(self)
-
-    def get(self, k, default=None):
-        return super(LowerDict, self).get(_ci_str(k), default)
-
-    def setdefault(self, k, default=None):
-        return super(LowerDict, self).setdefault(_ci_str(k), default)
-
-    __no_default = object()
-    def pop(self, k, v=__no_default):
-        if v is LowerDict.__no_default:
-            # super will raise KeyError if no default and key does not exist
-            return super(LowerDict, self).pop(_ci_str(k))
-        return super(LowerDict, self).pop(_ci_str(k), v)
-
-    def update(self, mapping=(), **kwargs):
-        super(LowerDict, self).update(self._process_args(mapping, **kwargs))
-
-    def __contains__(self, k):
-        return super(LowerDict, self).__contains__(_ci_str(k))
-
-    @classmethod
-    def fromkeys(cls, keys, v=None):
-        return super(LowerDict, cls).fromkeys((_ci_str(k) for k in keys), v)
-
-    def __repr__(self):
-        return '{0}({1})'.format(type(self).__name__,
-                                 super(LowerDict, self).__repr__())
-
-class DefaultLowerDict(LowerDict, collections.defaultdict):
-    """LowerDict that inherits from defaultdict."""
-    __slots__ = () # no __dict__ - that would be redundant
-
-    def __init__(self, default_factory=None, mapping=(), **kwargs):
-        # note we can't use LowerDict __init__ directly
-        super(LowerDict, self).__init__(default_factory,
-                                        self._process_args(mapping, **kwargs))
-
-    def copy(self):
-        return type(self)(self.default_factory, self)
-
-    def __repr__(self):
-        return '{0}({1},{2})'.format(type(self).__name__, self.default_factory,
-            super(collections.defaultdict, self).__repr__())
 
 # sio - StringIO wrapper so it uses the 'with' statement, so they can be used
 #  in the same functions that accept files as input/output as well.  Really,

@@ -51,6 +51,7 @@ from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
 from ..bolt import DataDict, deprint, sio, struct_pack, \
     struct_unpack
+from ..bolt_module.collect import LowerDict
 from ..bolt_module.paths import GPath, Path
 from ..bolt_module.unicode_utils import decode
 from ..brec import MreRecord, ModReader
@@ -1571,7 +1572,7 @@ class INIInfos(TableFileInfos):
         # new_tweak is an abs path, join works ok relative to self.store_dir
         dup_info = self._copy_to_new_tweak(self[tweak], new_tweak)
         # Now edit it with the values from the target INI
-        new_tweak_settings = bolt.LowerDict(dup_info.get_ci_settings())
+        new_tweak_settings = LowerDict(dup_info.get_ci_settings())
         target_settings = self.ini.get_ci_settings()
         for section in new_tweak_settings:
             if section in target_settings:

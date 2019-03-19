@@ -33,6 +33,7 @@ import wx
 import wx.wizard as wiz     # wxPython wizard class
 import bosh, balt, bolt, bush
 from bolt_module.paths import GPath
+from bolt_module.collect import LowerDict
 from balt import vspace, hspace
 from env import get_file_version
 import StringIO
@@ -779,8 +780,8 @@ class WryeParser(ScriptParser.Parser):
 
             self.choices = []
             self.choiceIdex = -1
-            self.sublist = bolt.LowerDict()
-            self.espmlist = bolt.LowerDict()
+            self.sublist = LowerDict()
+            self.espmlist = LowerDict()
             for k, v in installer.espmMap.iteritems():
                 for j in v:
                     if j not in self.espmlist:
@@ -1128,7 +1129,7 @@ class WryeParser(ScriptParser.Parser):
             else:
                 comment = u';'+comment
         else: comment = u''
-        self.iniedits.setdefault(iniPath, bolt.LowerDict()).setdefault(realSection, [section, bolt.LowerDict()])
+        self.iniedits.setdefault(iniPath, LowerDict()).setdefault(realSection, [section, LowerDict()])
         self.iniedits[iniPath][realSection][0] = section
         self.iniedits[iniPath][realSection][1][setting.strip()] = (
             setting, value, comment, False)
@@ -1140,7 +1141,7 @@ class WryeParser(ScriptParser.Parser):
         realSection = OBSEIniFile.ci_pseudosections.get(section, section)
         #--Setting
         setting = setting.strip()
-        self.iniedits.setdefault(iniPath, bolt.LowerDict()).setdefault(realSection,[section,bolt.LowerDict()])
+        self.iniedits.setdefault(iniPath, LowerDict()).setdefault(realSection, [section, LowerDict()])
         self.iniedits[iniPath][realSection][0] = section
         self.iniedits[iniPath][realSection][1][setting] = (setting,u'',u'',True)
 

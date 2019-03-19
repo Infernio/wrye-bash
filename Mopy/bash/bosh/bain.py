@@ -43,7 +43,8 @@ from .. import bush, bass, bolt, env, archives
 from ..archives import readExts, defaultExt, list_archive, compress7z, \
     extract7z, compressionSettings
 from ..bolt import deprint, formatInteger, round_size, sio, \
-    SubProgress, CIstr, LowerDict
+    SubProgress
+from ..bolt_module.collect import CIstr, DefaultLowerDict, LowerDict
 from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \
     InstallerArchiveError, SkipError, StateError, FileError
@@ -103,8 +104,8 @@ class Installer(object):
         """Returns map of real to ghosted files in mods directory."""
         dataDir = bass.dirs['mods']
         ghosts = [x for x in dataDir.list() if x.cs[-6:] == u'.ghost']
-        return bolt.LowerDict((x.root.s, x.s) for x in ghosts if
-                              not dataDir.join(x).root.exists())
+        return LowerDict((x.root.s, x.s) for x in ghosts if
+                         not dataDir.join(x).root.exists())
 
     @staticmethod
     def final_update(new_sizeCrcDate, old_sizeCrcDate, pending, pending_size,
@@ -167,7 +168,7 @@ class Installer(object):
         self.blockSize = None #--package only - set here and there
         self.fileSizeCrcs = [] #--list of tuples for _all_ files in installer
         #--For InstallerProject's, cache if refresh projects is skipped
-        self.src_sizeCrcDate = bolt.LowerDict()
+        self.src_sizeCrcDate = LowerDict()
         #--Set by refreshBasic
         self.fileRootIdex = 0 # len of the root path including the final separator
         self.type = 0 #--Package type: 0: unset/invalid; 1: simple; 2: complex
@@ -175,7 +176,7 @@ class Installer(object):
         self.subActives = []
         self.extras_dict = {} # hack to add more persistent attributes
         #--Set by refreshDataSizeCrc
-        self.dirty_sizeCrc = bolt.LowerDict()
+        self.dirty_sizeCrc = LowerDict()
         self.packageDoc = self.packagePic = None
         #--User Only
         self.skipVoices = False
@@ -195,10 +196,10 @@ class Installer(object):
         #--Volatile: set by refreshDataSizeCrc
         # LowerDict mapping destinations (relative to Data/ directory) of files
         # in this installer to their size and crc - built in refreshDataSizeCrc
-        self.ci_dest_sizeCrc = bolt.LowerDict()
+        self.ci_dest_sizeCrc = LowerDict()
         self.hasWizard = False
         self.hasBCF = False
-        self.espmMap = bolt.DefaultLowerDict(list)
+        self.espmMap = DefaultLowerDict(list)
         self.hasReadme = False
         self.hasBethFiles = False
         self.skipExtFiles = set()
@@ -320,12 +321,12 @@ class Installer(object):
         package_path = bass.dirs['installers'].join(self.archive)
         if not package_path.exists():  # pickled installer deleted outside bash
             return  # don't do anything should be deleted from our data soon
-        if not isinstance(self.src_sizeCrcDate, bolt.LowerDict):
-            self.src_sizeCrcDate = bolt.LowerDict(
-                ('%s' % x, y) for x, y in self.src_sizeCrcDate.iteritems())
-        if not isinstance(self.dirty_sizeCrc, bolt.LowerDict):
-            self.dirty_sizeCrc = bolt.LowerDict(
-                ('%s' % x, y) for x, y in self.dirty_sizeCrc.iteritems())
+        if not isinstance(self.src_sizeCrcDate, LowerDict):
+            self.src_sizeCrcDate = LowerDict(('%s' % x, y) for x, y in
+                                             self.src_sizeCrcDate.iteritems())
+        if not isinstance(self.dirty_sizeCrc, LowerDict):
+            self.dirty_sizeCrc = LowerDict(('%s' % x, y) for x, y in
+                                           self.dirty_sizeCrc.iteritems())
         if rescan:
             dest_scr = self.refreshBasic(bolt.Progress(),
                                          recalculate_project_crc=False)
@@ -607,7 +608,7 @@ class Installer(object):
         self.packageDoc = self.packagePic = None # = self.extras_dict['readMe']
         for attr in {'skipExtFiles','skipDirFiles','espms'}:
             object.__getattribute__(self,attr).clear()
-        dest_src = bolt.LowerDict()
+        dest_src = LowerDict()
         #--Bad archive?
         if type_ not in {1,2}: return dest_src
         archiveRoot = GPath(self.archive).sroot if isinstance(self,
@@ -637,13 +638,13 @@ class Installer(object):
         if type_ == 2: # exclude u'' from active subpackages
             activeSubs = set(
                 x for x, y in zip(self.subNames[1:], self.subActives[1:]) if y)
-        data_sizeCrc = bolt.LowerDict()
+        data_sizeCrc = LowerDict()
         skipDirFiles = self.skipDirFiles
         skipDirFilesAdd = skipDirFiles.add
         skipDirFilesDiscard = skipDirFiles.discard
         skipExtFilesAdd = self.skipExtFiles.add
         commonlyEditedExts = Installer.commonlyEditedExts
-        espmMap = self.espmMap = bolt.DefaultLowerDict(list)
+        espmMap = self.espmMap = DefaultLowerDict(list)
         reModExtMatch = ModInfos.file_pattern.match
         reReadMeMatch = Installer.reReadMe.match
         #--Scan over fileSizeCrcs
@@ -853,7 +854,7 @@ class Installer(object):
             self._refreshSource(progress, recalculate_project_crc)
         except InstallerArchiveError:
             self.type = -1 # size, modified and some of fileSizeCrcs may be set
-            return bolt.LowerDict()
+            return LowerDict()
         self._find_root_index()
         # fileRootIdex now points to the start in the file strings to ignore
         #--Type, subNames
@@ -1006,7 +1007,7 @@ class Installer(object):
         dest_src = self.refreshDataSizeCrc(True)
         for k in dest_src.keys():
             if k not in destFiles: del dest_src[k]
-        if not dest_src: return bolt.LowerDict(), set(), set()
+        if not dest_src: return LowerDict(), set(), set()
         progress = progress if progress else bolt.Progress()
         return self._install(dest_src, progress)
 
@@ -1019,7 +1020,7 @@ class Installer(object):
          an archive."""
         norm_ghost = Installer.getGhosted() # some.espm -> some.espm.ghost
         norm_ghostGet = norm_ghost.get
-        data_sizeCrcDate_update = bolt.LowerDict()
+        data_sizeCrcDate_update = LowerDict()
         data_sizeCrc = self.ci_dest_sizeCrc
         mods, inis = set(), set()
         srcs, dests = [], []
@@ -1112,7 +1113,7 @@ class InstallerMarker(Installer):
         return True, False, False
 
     def refreshBasic(self, progress, recalculate_project_crc=True):
-        return bolt.LowerDict()
+        return LowerDict()
 
 #------------------------------------------------------------------------------
 class InstallerArchive(Installer):
@@ -1310,8 +1311,8 @@ class InstallerProject(Installer):
         asRoot = apRoot.s
         relPos = len(asRoot) + 1
         max_mtime = apRoot.mtime
-        pending, pending_size = bolt.LowerDict(), 0
-        new_sizeCrcDate = bolt.LowerDict()
+        pending, pending_size = LowerDict(), 0
+        new_sizeCrcDate = LowerDict()
         oldGet = self.src_sizeCrcDate.get
         walk = self._dir_dirs_files if self._dir_dirs_files is not None else bolt.walkdir(asRoot)
         for asDir, __sDirs, sFiles in walk:
@@ -1404,7 +1405,7 @@ class InstallerProject(Installer):
     def syncToData(self, projFiles):
         """Copies specified projFiles from Oblivion\Data to project
         directory.
-        :type projFiles: set[bolt.CIstr]"""
+        :type projFiles: set[CIstr]"""
         srcDir = bass.dirs['mods']
         srcProj = tuple(
             (x, y) for x, y in self.refreshDataSizeCrc().iteritems() if
@@ -1525,13 +1526,13 @@ class InstallersData(DataStore):
         #--Persistent data
         self.dictFile = bolt.PickleDict(self.bash_dir.join(u'Installers.dat'))
         self.data = {}
-        self.data_sizeCrcDate = bolt.LowerDict()
+        self.data_sizeCrcDate = LowerDict()
         from . import converters
         self.converters_data = converters.ConvertersData(bass.dirs['bainData'],
             bass.dirs['converters'], bass.dirs['dupeBCFs'],
             bass.dirs['corruptBCFs'], bass.dirs['installers'])
         #--Volatile
-        self.ci_underrides_sizeCrc = bolt.LowerDict() # underridden files
+        self.ci_underrides_sizeCrc = LowerDict() # underridden files
         self.bcfPath_sizeCrcDate = {}
         self.hasChanged = False
         self.loaded = False
@@ -1591,8 +1592,8 @@ class InstallersData(DataStore):
         data = self.dictFile.data
         self.data = data.get('installers', {})
         pickle = data.get('sizeCrcDate', {})
-        self.data_sizeCrcDate = bolt.LowerDict(pickle) if not isinstance(
-            pickle, bolt.LowerDict) else pickle
+        self.data_sizeCrcDate = LowerDict(pickle) if not isinstance(
+            pickle, LowerDict) else pickle
         # fixup: all markers had their archive attribute set to u'===='
         for key, value in self.iteritems():
             if isinstance(value, InstallerMarker):
@@ -1869,11 +1870,11 @@ class InstallersData(DataStore):
         """Populate self.ci_underrides_sizeCrc with all underridden files."""
         active_sorted = (x for x in self.sorted_values() if x.isActive)
         #--dict mapping all should-be-installed files to their attributes
-        norm_sizeCrc = bolt.LowerDict()
+        norm_sizeCrc = LowerDict()
         for package in active_sorted:
             norm_sizeCrc.update(package.ci_dest_sizeCrc)
         #--Abnorm
-        ci_underrides_sizeCrc = bolt.LowerDict()
+        ci_underrides_sizeCrc = LowerDict()
         dataGet = self.data_sizeCrcDate.get
         for path,sizeCrc in norm_sizeCrc.iteritems():
             sizeCrcDate = dataGet(path)
@@ -1945,11 +1946,11 @@ class InstallersData(DataStore):
         """
         from . import modInfos # to get the crcs for espms
         progress.setFull(1 + len(dirDirsFiles))
-        pending, pending_size = bolt.LowerDict(), 0
-        new_sizeCrcDate = bolt.LowerDict()
+        pending, pending_size = LowerDict(), 0
+        new_sizeCrcDate = LowerDict()
         oldGet = self.data_sizeCrcDate.get
-        ghost_norm = bolt.LowerDict(
-            (y, x) for x, y in Installer.getGhosted().iteritems())
+        ghost_norm = LowerDict((y, x) for x, y in
+                               Installer.getGhosted().iteritems())
         if bass.settings['bash.installers.autoRefreshBethsoft']:
             bethFiles = set()
         else:
@@ -2415,7 +2416,7 @@ class InstallersData(DataStore):
         masked = set()
         removes = set()
         #--March through packages in reverse order...
-        restores = bolt.LowerDict()
+        restores = LowerDict()
         cede_ownership = collections.defaultdict(set)
         for installer in self.sorted_values(reverse=True):
             #--Uninstall archive?
@@ -2492,7 +2493,7 @@ class InstallersData(DataStore):
                 removes |= set(installer.dirty_sizeCrc)
             installer.dirty_sizeCrc.clear()
         #--March through packages in reverse order...
-        restores = bolt.LowerDict()
+        restores = LowerDict()
         cede_ownership = collections.defaultdict(set)
         for installer in self.sorted_values(reverse=True):
             #--Other active package. May provide a restore file.
@@ -2508,16 +2509,16 @@ class InstallersData(DataStore):
             if installer.isActive:
                 keepFiles.update(installer.ci_dest_sizeCrc) # relative to Data/
         from . import modInfos
-        keepFiles.update((bolt.CIstr(f) for f in bush.game_mod.allBethFiles))
+        keepFiles.update((CIstr(f) for f in bush.game_mod.allBethFiles))
         for f in modInfos.bashed_patches: # type: bolt.Path
-            keepFiles.add(bolt.CIstr(f.s))
+            keepFiles.add(CIstr(f.s))
             bp_doc = modInfos.table.getItem(f, 'doc')
             if bp_doc: # path is absolute, convert to relative to the Data/ dir
                 bp_doc = bp_doc.relpath(bass.dirs['mods'].s)
-                keepFiles.add((bolt.CIstr('%s' % bp_doc))) # .txt
-                keepFiles.add((bolt.CIstr(bp_doc.root.s + u'.html')))
-        keepFiles.update((bolt.CIstr(f) for f in bush.game.wryeBashDataFiles))
-        keepFiles.update((bolt.CIstr(f) for f in bush.game.ignoreDataFiles))
+                keepFiles.add((CIstr('%s' % bp_doc))) # .txt
+                keepFiles.add((CIstr(bp_doc.root.s + u'.html')))
+        keepFiles.update((CIstr(f) for f in bush.game.wryeBashDataFiles))
+        keepFiles.update((CIstr(f) for f in bush.game.ignoreDataFiles))
         removes = set(self.data_sizeCrcDate) - keepFiles
         destDir = bass.dirs['bainData'].join(u'Data Folder Contents (%s)' %
             bolt.timestamp())
