@@ -32,7 +32,7 @@ from .. import barb, bush, balt, bass, bolt, env, exception
 from ..balt import ItemLink, AppendableLink, RadioLink, CheckLink, MenuLink, \
     TransLink, EnabledLink, BoolLink, tooltip, Link
 from ..bolt import deprint, GPath
-from ..bolt_module import unicode_utils
+from ..bolt_module import localization, unicode_utils
 from ..exception import BoltError
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 
@@ -491,7 +491,7 @@ class Settings_DumpTranslator(AppendableLink, ItemLink):
                                 _(u'Dump Translator')): return
         outPath = bass.dirs['l10n']
         with balt.BusyCursor():
-            outFile = bolt.dumpTranslator(outPath.s, _bassLang())
+            outFile = localization.dumpTranslator(outPath.s, _bassLang())
         self._showOk(_(
             u'Translation keys written to ') + u'Mopy\\bash\\l10n\\' + outFile,
                      _(u'Dump Translator') + u': ' + outPath.stail)
