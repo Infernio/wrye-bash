@@ -41,6 +41,7 @@ from ..balt import ItemLink, Link, TextCtrl, toggleButton, vSizer, hspacer, \
     SeparatorLink, ChoiceLink, OneItemLink, Image, ListBoxes, OkButton
 from ..bolt import SubProgress, formatDate
 from ..bolt_module import paths
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath
 from ..bosh import faces
 from ..cint import CBashApi, FormID
@@ -709,7 +710,7 @@ class Mod_ListDependent(OneItemLink):
         merged_, imported_ = modInfos.merged, modInfos.imported
         head, bul = u'=== ', u'* '
         with bolt.sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             log(u'[spoiler][xml]')
             log.setHeader(head + self.legend + u': ')
             loOrder =  lambda tup: load_order.cached_lo_index_or_max(tup[0])
@@ -1111,7 +1112,7 @@ class Mod_ListPatchConfig(_Mod_BP_Link):
         patchers.sort(key=lambda a: a.__class__.name)
         patchers.sort(key=lambda a: groupOrder[a.__class__.group])
         #--Log & Clipboard text
-        log = bolt.LogFile(StringIO.StringIO())
+        log = LogFile(StringIO.StringIO())
         log.setHeader(u'= %s %s' % (self._selected_item, _(u'Config')))
         log(_(u'This is the current configuration of this Bashed Patch.  This report has also been copied into your clipboard.')+u'\n')
         clip = StringIO.StringIO()
@@ -1237,7 +1238,7 @@ class Mod_ScanDirty(ItemLink):
                 ret = bosh.mods_metadata.ModCleaner.scan_Many(modInfos, progress=progress, detailed=True)
         except CancelError:
             return
-        log = bolt.LogFile(StringIO.StringIO())
+        log = LogFile(StringIO.StringIO())
         log.setHeader(u'= '+_(u'Scan Mods'))
         log(_(u'This is a report of records that were detected as either Identical To Master (ITM) or a deleted reference (UDR).')
             + u'\n')
@@ -1401,7 +1402,7 @@ class Mod_UndeleteRefs(EnabledLink):
         with balt.Progress(self._text) as progress:
             progress.setFull(len(self.selected))
             hasFixed = False
-            log = bolt.LogFile(StringIO.StringIO())
+            log = LogFile(StringIO.StringIO())
             for index,(fileName,fileInfo) in enumerate(self.iselected_pairs()):
                 if bosh.reOblivion.match(fileName.s):
                     self._showWarning(_(u'Skipping') + u' ' + fileName.s,

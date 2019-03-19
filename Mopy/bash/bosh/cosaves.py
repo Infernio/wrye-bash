@@ -63,7 +63,7 @@ class _Chunk(object):
         """
         :param save_masters: the espm masters of the save, used in xSE chunks
         :param espmMap: a dict populated in pluggy chunks
-        :type log: bolt.Log
+        :type log: bolt_module.output.Log
         """
 
     def chunk_map_master(self, master_renames_dict, plugin_chunk):

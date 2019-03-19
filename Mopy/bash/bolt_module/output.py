@@ -30,6 +30,65 @@ from .paths import Path, GPath
 # TODO(inf) Have to use absolute import here, relative crashes - why?
 from exception import BoltError
 
+class Log:
+    """Log Callable. This is the abstract/null version. Useful version should
+    override write functions.
+
+    Log is divided into sections with headers. Header text is assigned (through
+    setHeader), but isn't written until a message is written under it. I.e.,
+    if no message are written under a given header, then the header itself is
+    never written."""
+
+    def __init__(self):
+        """Initialize."""
+        self.header = None
+        self.prevHeader = None
+
+    def setHeader(self,header,writeNow=False,doFooter=True):
+        """Sets the header."""
+        self.header = header
+        if self.prevHeader:
+            self.prevHeader += u'x'
+        self.doFooter = doFooter
+        if writeNow: self()
+
+    def __call__(self,message=None,appendNewline=True):
+        """Callable. Writes message, and if necessary, header and footer."""
+        if self.header != self.prevHeader:
+            if self.prevHeader and self.doFooter:
+                self.writeFooter()
+            if self.header:
+                self.writeLogHeader(self.header)
+            self.prevHeader = self.header
+        if message: self.writeMessage(message,appendNewline)
+
+    #--Abstract/null writing functions...
+    def writeLogHeader(self, header):
+        """Write header. Abstract/null version."""
+        pass
+    def writeFooter(self):
+        """Write mess. Abstract/null version."""
+        pass
+    def writeMessage(self,message,appendNewline):
+        """Write message to log. Abstract/null version."""
+        pass
+
+class LogFile(Log):
+    """Log that writes messages to file."""
+    def __init__(self,out):
+        self.out = out
+        Log.__init__(self)
+
+    def writeLogHeader(self, header):
+        self.out.write(header+u'\n')
+
+    def writeFooter(self):
+        self.out.write(u'\n')
+
+    def writeMessage(self,message,appendNewline):
+        self.out.write(message)
+        if appendNewline: self.out.write(u'\n')
+
 codebox = None
 class WryeText:
     """This class provides a function for converting wtxt text files to html

@@ -28,12 +28,14 @@ attribute points to BashFrame.saveList singleton."""
 import StringIO
 import re
 import shutil
+
 from . import BashFrame
 from .dialogs import ImportFaceDialog
 from .. import bass, bosh, bolt, balt, bush, parsers, load_order, initialization
 from ..balt import EnabledLink, AppendableLink, Link, CheckLink, ChoiceLink, \
     ItemLink, SeparatorLink, OneItemLink, Image, UIList_Rename
 from ..bolt import SubProgress, formatInteger, struct_pack, struct_unpack
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath
 from ..bosh import faces
 from ..exception import ArgumentError, BoltError, CancelError, ModError
@@ -749,7 +751,7 @@ class Save_Stats(OneItemLink):
         saveFile = bosh._saves.SaveFile(self._selected_info)
         with balt.Progress(_(u"Statistics")) as progress:
             saveFile.load(SubProgress(progress,0,0.9))
-            log = bolt.LogFile(StringIO.StringIO())
+            log = LogFile(StringIO.StringIO())
             progress(0.9,_(u"Calculating statistics."))
             saveFile.logStats(log)
             progress.Destroy()
@@ -771,7 +773,7 @@ class Save_StatObse(AppendableLink, OneItemLink):
 
     def Execute(self):
         with balt.BusyCursor():
-            log = bolt.LogFile(StringIO.StringIO())
+            log = LogFile(StringIO.StringIO())
             cosave = self._selected_info.get_cosave()
             if cosave is not None:
                 cosave.logStatObse(log, self._selected_info.header.masters)

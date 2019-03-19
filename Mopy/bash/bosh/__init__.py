@@ -52,6 +52,7 @@ from ..bass import dirs, inisettings, tooldirs
 from ..bolt import deprint, sio, struct_pack, \
     struct_unpack
 from ..bolt_module.collect import DataDict, LowerDict, Settings
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath, Path
 from ..bolt_module.unicode_utils import decode
 from ..brec import MreRecord, ModReader
@@ -959,7 +960,7 @@ class INIInfo(IniFile):
         if len(errors) == 1:
             errors.append(u' None')
         with sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             for line in errors:
                 log(line)
             return bolt.winNewLines(log.out.getvalue())
@@ -2079,7 +2080,7 @@ class ModInfos(FileInfos):
         for its masters. Otherwise will show currently loaded mods."""
         #--Setup
         with sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             head,bul,sMissing,sDelinquent,sImported = (
                 u'=== ',
                 u'* ',

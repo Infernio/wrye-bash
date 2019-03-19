@@ -44,8 +44,8 @@ from .. import bass, bolt, bosh, bush, balt, archives
 from ..balt import EnabledLink, CheckLink, AppendableLink, OneItemLink, \
     UIList_Rename, UIList_Hide
 from ..belt import InstallerWizard, generateTweakLines
-from ..bolt import deprint, SubProgress, LogFile, formatInteger, \
-    round_size
+from ..bolt import deprint, SubProgress, formatInteger, round_size
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath
 from ..exception import CancelError, SkipError, StateError
 

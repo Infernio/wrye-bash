@@ -37,8 +37,8 @@ from ..balt import StaticText, vSizer, hSizer, hspacer, Link, OkButton, \
     SelectAllButton, CancelButton, SaveAsButton, OpenButton, \
     RevertToSavedButton, RevertButton, hspace, vspace, Resources
 from ..bolt import SubProgress
+from ..bolt_module.output import LogFile, WryeText
 from ..bolt_module.paths import GPath, Path
-from ..bolt_module.output import WryeText
 from ..exception import BoltError, CancelError, FileEditError, \
     PluginsFullError, SkipError
 from ..patcher import configIsCBash, exportConfig
@@ -188,7 +188,7 @@ class PatchDialog(balt.Dialog):
             #--Save configs
             self._saveConfig(patch_name)
             #--Do it
-            log = bolt.LogFile(StringIO.StringIO())
+            log = LogFile(StringIO.StringIO())
             patchers = [patcher for patcher in self.patchers if patcher.isEnabled]
             patchFile = CBash_PatchFile(patch_name, patchers) if self.doCBash \
                    else PatchFile(self.patchInfo, patchers)

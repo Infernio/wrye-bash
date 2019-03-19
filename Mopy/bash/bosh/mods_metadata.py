@@ -28,6 +28,7 @@ import re
 from ._mergeability import is_esl_capable
 from .. import balt, bolt, bush, bass, load_order
 from ..bolt import deprint, sio, struct_pack, struct_unpack
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode
 from ..brec import ModReader, MreRecord
@@ -378,7 +379,7 @@ class ConfigHelpers:
         warning = u'=== <font color=red>'+_(u'WARNING:')+u'</font> '
         #--Header
         with sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             log.setHeader(u'= '+_(u'Check Mods'),True)
             if bush.game.check_esl:
                 log(_(u'This is a report on your currently installed or '

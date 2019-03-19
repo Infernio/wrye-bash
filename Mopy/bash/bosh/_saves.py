@@ -32,6 +32,7 @@ from .. import bolt, bush
 from ..bolt import Flags, sio, deprint, cstrip, \
     SubProgress, unpack_byte, unpack_str8, unpack_many, unpack_int, \
     unpack_short, struct_pack, struct_unpack
+from ..bolt_module.output import Log
 from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode, encode
 from ..brec import ModReader, MreRecord, ModWriter, getObjectIndex, \
@@ -592,7 +593,7 @@ class SaveFile:
     #--------------------------------------------------------------------------
     def logStats(self,log=None):
         """Print stats to log."""
-        log = log or bolt.Log()
+        log = log or Log()
         doLostChanges = False
         doUnknownTypes = False
         def getMaster(modIndex):

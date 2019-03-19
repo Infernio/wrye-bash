@@ -45,6 +45,7 @@ from ..archives import readExts, defaultExt, list_archive, compress7z, \
 from ..bolt import deprint, formatInteger, round_size, sio, \
     SubProgress
 from ..bolt_module.collect import CIstr, DefaultLowerDict, LowerDict
+from ..bolt_module.output import LogFile
 from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \
     InstallerArchiveError, SkipError, StateError, FileError
@@ -1050,7 +1051,7 @@ class Installer(object):
     def listSource(self):
         """Return package structure as text."""
         with sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             log.setHeader(u'%s ' % self.archive + _(u'Package Structure:'))
             log(u'[spoiler][xml]\n', False)
             apath = bass.dirs['installers'].join(self.archive)
@@ -2678,7 +2679,7 @@ class InstallersData(DataStore):
         """Returns package list as text."""
         #--Setup
         with sio() as out:
-            log = bolt.LogFile(out)
+            log = LogFile(out)
             log.setHeader(_(u'Bain Packages:'))
             #--List
             log(u'[spoiler][xml]\n',False)
