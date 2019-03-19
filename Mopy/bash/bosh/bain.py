@@ -42,8 +42,9 @@ from .. import balt # YAK!
 from .. import bush, bass, bolt, env, archives
 from ..archives import readExts, defaultExt, list_archive, compress7z, \
     extract7z, compressionSettings
-from ..bolt import Path, deprint, formatInteger, round_size, GPath, sio, \
+from ..bolt import deprint, formatInteger, round_size, sio, \
     SubProgress, CIstr, LowerDict
+from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \
     InstallerArchiveError, SkipError, StateError, FileError
 
@@ -1685,9 +1686,9 @@ class InstallersData(DataStore):
         :type progress: bolt.Progress | None
         :type fullRefresh: bool
         :type refresh_info: InstallersData._RefreshInfo | None
-        :type deleted: collections.Iterable[bolt.Path] | None
-        :type pending: collections.Iterable[bolt.Path] | None
-        :type projects: collections.Iterable[bolt.Path] | None
+        :type deleted: collections.Iterable[Path] | None
+        :type pending: collections.Iterable[Path] | None
+        :type projects: collections.Iterable[Path] | None
         """
         # TODO(ut):we need to return the refresh_info for more granular control
         # in irefresh and also add extra processing for deleted files
@@ -2706,8 +2707,8 @@ class InstallersData(DataStore):
 
     def filterPackages(self, installerKeys):
         """Remove markers from installerKeys.
-        :type installerKeys: collections.Iterable[bolt.Path]
-        :rtype: list[bolt.Path]
+        :type installerKeys: collections.Iterable[Path]
+        :rtype: list[Path]
         """
         def _package(x):
             return isinstance(self[x], (InstallerArchive, InstallerProject))

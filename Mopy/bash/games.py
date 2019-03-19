@@ -36,6 +36,7 @@ from collections import defaultdict
 import bass
 import bolt
 from bolt_module import unicode_utils
+from bolt_module.paths import GPath, Path
 import env
 import exception
 
@@ -72,10 +73,10 @@ def _parse_plugins_txt_(path, mod_infos, _star):
     all other cases use the first list, which is either the list of active
     mods (when parsing plugins.txt) or the load order (when parsing
     loadorder.txt)
-    :type path: bolt.Path
+    :type path: Path
     :type mod_infos: bosh.ModInfos
     :type _star: bool
-    :rtype: (list[bolt.Path], list[bolt.Path])
+    :rtype: (list[Path], list[Path])
     """
     with path.open('r') as ins:
         #--Load Files
@@ -93,23 +94,23 @@ def _parse_plugins_txt_(path, mod_infos, _star):
             except UnicodeError:
                 bolt.deprint(u'%r failed to properly decode' % modname)
                 continue
-            if bolt.GPath(test) not in mod_infos:
+            if GPath(test) not in mod_infos:
                 # The automatic encoding detector could have returned
                 # an encoding it actually wasn't.  Luckily, we
                 # have a way to double check: modInfos.data
                 for encoding in unicode_utils.encodingOrder:
                     try:
                         test2 = unicode(modname, encoding)
-                        if bolt.GPath(test2) not in mod_infos:
+                        if GPath(test2) not in mod_infos:
                             continue
-                        modname = bolt.GPath(test2)
+                        modname = GPath(test2)
                         break
                     except UnicodeError:
                         pass
                 else:
-                    modname = bolt.GPath(test)
+                    modname = GPath(test)
             else:
-                modname = bolt.GPath(test)
+                modname = GPath(test)
             modnames.append(modname)
             if is_active: active.append(modname)
     return active, modnames
@@ -218,9 +219,9 @@ class Game(object):
         pass a cached value for either parameter this value will be returned
         unchanged, possibly validating the other one based on stale data.
         NOTE: modInfos must exist and be up to date for validation.
-        :type cached_load_order: tuple[bolt.Path]
-        :type cached_active_ordered: tuple[bolt.Path]
-        :rtype: (tuple[bolt.Path], tuple[bolt.Path])
+        :type cached_load_order: tuple[Path]
+        :type cached_active_ordered: tuple[Path]
+        :rtype: (tuple[Path], tuple[Path])
         """
         if cached_load_order is not None and cached_active_ordered is not None:
             return cached_load_order, cached_active_ordered # NOOP
@@ -324,12 +325,12 @@ class Game(object):
 
     # ABSTRACT ----------------------------------------------------------------
     def _fetch_load_order(self, cached_load_order, cached_active):
-        """:type cached_load_order: tuple[bolt.Path]
-        :type cached_active: tuple[bolt.Path]"""
+        """:type cached_load_order: tuple[Path]
+        :type cached_active: tuple[Path]"""
         raise exception.AbstractError
 
     def _fetch_active_plugins(self): # no override for AsteriskGame
-        """:rtype: list[bolt.Path]"""
+        """:rtype: list[Path]"""
         raise exception.AbstractError
 
     def _persist_load_order(self, lord, active):
@@ -348,7 +349,7 @@ class Game(object):
 
     # MODFILES PARSING --------------------------------------------------------
     def _parse_modfile(self, path):
-        """:rtype: (list[bolt.Path], list[bolt.Path])"""
+        """:rtype: (list[Path], list[Path])"""
         if not path.exists(): return [], []
         #--Read file
         acti, _lo = _parse_plugins_txt_(path, self.mod_infos, _star=False)
@@ -359,7 +360,7 @@ class Game(object):
 
     # PLUGINS TXT -------------------------------------------------------------
     def _parse_plugins_txt(self):
-        """:rtype: (list[bolt.Path], list[bolt.Path])"""
+        """:rtype: (list[Path], list[Path])"""
         if not self.plugins_txt_path.exists(): return [], []
         #--Read file
         acti, _lo = self._parse_modfile(self.plugins_txt_path)
@@ -384,7 +385,7 @@ class Game(object):
         set_load_order() to check if a load order passed in is valid. Needs
         rethinking as save load and active should be an atomic operation -
         leads to hacks (like the _selected parameter).
-        :type lord: list[bolt.Path]
+        :type lord: list[Path]
         """
         if fix_lo is None: fix_lo = FixInfo() # discard fix info
         old_lord = lord[:]
@@ -499,7 +500,7 @@ class Game(object):
 
     @staticmethod
     def _check_for_duplicates(plugins_list):
-        """:type plugins_list: list[bolt.Path]"""
+        """:type plugins_list: list[Path]"""
         mods, duplicates, j = set(), set(), 0
         for i, mod in enumerate(plugins_list[:]):
             if mod in mods:
@@ -518,7 +519,7 @@ class TimestampGame(Game):
     """Oblivion and other games where load order is set using modification
     times.
 
-    :type _mtime_mods: dict[int, set[bolt.Path]]
+    :type _mtime_mods: dict[int, set[Path]]
     """
 
     allow_deactivate_master = True
@@ -613,7 +614,7 @@ class TimestampGame(Game):
 
 class TextfileGame(Game):
 
-    must_be_active_if_present = (bolt.GPath(u'Update.esm'),)
+    must_be_active_if_present = (GPath(u'Update.esm'),)
 
     def __init__(self, mod_infos, plugins_txt_path, loadorder_txt_path):
         super(TextfileGame, self).__init__(mod_infos, plugins_txt_path)
@@ -654,7 +655,7 @@ class TextfileGame(Game):
         anyway call _fix_load_order. If cached_active is passed, the relative
         order of mods will be corrected to match their relative order in
         cached_active.
-        :type cached_active: tuple[bolt.Path] | list[bolt.Path]"""
+        :type cached_active: tuple[Path] | list[Path]"""
         if not self.loadorder_txt_path.exists():
             mods = cached_active or []
             if cached_active is not None and not self.plugins_txt_path.exists():
@@ -850,7 +851,7 @@ class AsteriskGame(Game):
         _ccc_path = bass.dirs['app'].join(cls._ccc_filename)
         try:
             with open(_ccc_path.s, 'r') as ins:
-                lines = map(bolt.GPath, map(str.strip, ins.readlines()))
+                lines = map(GPath, map(str.strip, ins.readlines()))
                 cls.must_be_active_if_present += tuple(lines)
         except (OSError, IOError) as e:
             if e.errno != errno.ENOENT:
@@ -859,32 +860,30 @@ class AsteriskGame(Game):
 # AsteriskGame overrides
 class Fallout4(AsteriskGame):
 
-    must_be_active_if_present = (bolt.GPath(u'DLCRobot.esm'),
-                                 bolt.GPath(u'DLCworkshop01.esm'),
-                                 bolt.GPath(u'DLCCoast.esm'),
-                                 bolt.GPath(u'DLCWorkshop02.esm'),
-                                 bolt.GPath(u'DLCWorkshop03.esm'),
-                                 bolt.GPath(u'DLCNukaWorld.esm'),
-                                 bolt.GPath(u'DLCUltraHighResolution.esm'),)
+    must_be_active_if_present = (GPath(u'DLCRobot.esm'),
+                                 GPath(u'DLCworkshop01.esm'),
+                                 GPath(u'DLCCoast.esm'),
+                                 GPath(u'DLCWorkshop02.esm'),
+                                 GPath(u'DLCWorkshop03.esm'),
+                                 GPath(u'DLCNukaWorld.esm'),
+                                 GPath(u'DLCUltraHighResolution.esm'),)
     _ccc_filename = u'Fallout4.ccc'
 
     @property
     def remove_from_plugins_txt(self):
-        return {bolt.GPath(u'Fallout4.esm')} | set(
-            self.must_be_active_if_present)
+        return {GPath(u'Fallout4.esm')} | set(self.must_be_active_if_present)
 
 class SkyrimSE(AsteriskGame):
 
-    must_be_active_if_present = (bolt.GPath(u'Update.esm'),
-                                 bolt.GPath(u'Dawnguard.esm'),
-                                 bolt.GPath(u'Hearthfires.esm'),
-                                 bolt.GPath(u'Dragonborn.esm'),)
+    must_be_active_if_present = (GPath(u'Update.esm'),
+                                 GPath(u'Dawnguard.esm'),
+                                 GPath(u'Hearthfires.esm'),
+                                 GPath(u'Dragonborn.esm'),)
     _ccc_filename = u'Skyrim.ccc'
 
     @property
     def remove_from_plugins_txt(self):
-        return {bolt.GPath(u'Skyrim.esm')} | set(
-            self.must_be_active_if_present)
+        return {GPath(u'Skyrim.esm')} | set(self.must_be_active_if_present)
 
     __dlc_spacing = 60 # in seconds
     def _fixed_order_plugins(self):
@@ -896,7 +895,7 @@ class SkyrimSE(AsteriskGame):
             x for x in self.must_be_active_if_present if x in self.mod_infos)
         # rewrite mtimes
         master_mtime = self.mod_infos[self.master_path].mtime
-        update = bolt.GPath(u'Update.esm')
+        update = GPath(u'Update.esm')
         for dlc in add[1:]:
             if dlc == update:
                 master_mtime = self.mod_infos[update].mtime

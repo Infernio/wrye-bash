@@ -40,6 +40,7 @@ encodingOrder = (
     'cp500',
     'UTF-16LE',
     )
+# mbcs must be last, because it decodes everything - even things it can't
 if os.name == u'nt':
     encodingOrder += ('mbcs',)
 

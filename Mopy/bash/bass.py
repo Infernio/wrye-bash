@@ -89,7 +89,7 @@ def newTempDir():
     """Generate a new temporary directory name, set it as the current Temp
     Dir."""
     global _tempDir
-    from bolt import Path
+    from bolt_module.paths import Path
     _tempDir = Path.tempDir()
     return _tempDir
 

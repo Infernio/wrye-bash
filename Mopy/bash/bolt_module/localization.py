@@ -33,6 +33,7 @@ import sys
 import traceback
 
 from .unicode_utils import decode
+from .paths import GPath, Path
 
 def _findAllBashModules(files=[], bashPath=None, cwd=None,
                         exts=('.py', '.pyw'), exclude=(u'chardet',),
@@ -49,8 +50,6 @@ def _findAllBashModules(files=[], bashPath=None, cwd=None,
     :param exclude: tuple of excluded packages
     :param _firstRun: internal use
     """
-    # TODO(inf) BOLT_MODULE: Move to regular import once done
-    from ..bolt import Path, GPath
     if not _firstRun and files:
         return files # cache, not likely to change during execution
     cwd = cwd or os.getcwdu()

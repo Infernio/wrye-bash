@@ -29,7 +29,7 @@ import random
 import re
 # Internal
 from ... import bass # for dirs
-from ...bolt import GPath
+from ...bolt_module.paths import GPath
 from ...cint import FormID
 from ...exception import AbstractError
 from ...patcher.base import AMultiTweakItem

@@ -30,7 +30,8 @@ from .base import Patcher, CBash_Patcher, SpecialPatcher, ListPatcher, \
     CBash_ListPatcher, AListPatcher
 from ... import bosh, load_order  # for modInfos
 from ... import bush
-from ...bolt import GPath, SubProgress
+from ...bolt import SubProgress
+from ...bolt_module.paths import GPath
 from ...cint import FormID
 
 # Patchers: 40 ----------------------------------------------------------------

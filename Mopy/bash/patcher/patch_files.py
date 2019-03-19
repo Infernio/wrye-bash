@@ -32,7 +32,8 @@ from .. import load_order
 from .. import bass
 from ..parsers import LoadFactory, ModFile, MasterSet
 from ..brec import MreRecord
-from ..bolt import GPath, SubProgress, deprint, Progress
+from ..bolt import SubProgress, deprint, Progress
+from ..bolt_module.paths import GPath, Path
 from ..cint import ObModFile, FormID, dump_record, ObCollection, MGEFCode
 from ..exception import AbstractError, BoltError, CancelError, ModError, \
     StateError
@@ -41,13 +42,13 @@ from ..record_groups import MobObjects
 # the currently executing patch set in _Mod_Patch_Update before showing the
 # dialog - used in getAutoItems, to get mods loading before the patch
 ##: HACK ! replace with method param once gui_patchers are refactored
-executing_patch = None # type: bolt.Path
+executing_patch = None # type: Path
 
 class _PFile(object):
     """Base class of patch files - factoring out common code __WIP__. Wraps an
     executing bashed Patch."""
     def __init__(self, patchers, patch_path):
-        """:type patch_path: bolt.Path"""
+        """:type patch_path: Path"""
         #--New attrs
         self.patchers = patchers
         self.patchName = patch_path # the bashed Patch

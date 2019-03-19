@@ -31,7 +31,8 @@ from operator import attrgetter
 from ... import bosh # for modInfos
 from ... import load_order
 from ...bush import game, game_mod # for Name patcher
-from ...bolt import GPath, MemorySet
+from ...bolt import MemorySet
+from ...bolt_module.paths import GPath
 from ...brec import MreRecord, MelObject
 from ...cint import ValidateDict, ValidateList, FormID, validTypes, \
     getattr_deep, setattr_deep

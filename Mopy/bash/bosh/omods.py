@@ -26,8 +26,9 @@ import re
 import subprocess
 from subprocess import PIPE
 from .. import env, bolt, bass, archives
-from ..bolt import Path, startupinfo, unpack_int_signed, \
+from ..bolt import startupinfo, unpack_int_signed, \
     unpack_byte, unpack_short, unpack_int64_signed, struct_pack
+from ..bolt_module.paths import Path
 from ..bolt_module.unicode_utils import decode, encode
 
 def _readNetString(open_file):

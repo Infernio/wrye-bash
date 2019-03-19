@@ -27,9 +27,10 @@ read them to log stats and write them to remap espm masters. We only handle
 renaming of the masters of the xSE plugin chunk itself and of the Pluggy chunk.
 """
 
-from ..bolt import sio, GPath, unpack_string, unpack_int, \
+from ..bolt import sio, unpack_string, unpack_int, \
     unpack_short, unpack_4s, unpack_byte, unpack_str16, struct_pack, \
     struct_unpack
+from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode, encode
 from ..exception import FileError
 

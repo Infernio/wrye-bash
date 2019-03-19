@@ -30,7 +30,7 @@ import wx
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
 from ..balt import fill, StaticText, vSizer, checkBox, Button, hsbSizer, \
     Links, SeparatorLink, CheckLink, Link, vspace, VSizer
-from ..bolt import GPath
+from ..bolt_module.paths import GPath
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)

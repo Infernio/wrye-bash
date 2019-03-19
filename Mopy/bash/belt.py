@@ -32,6 +32,7 @@ from ScriptParser import error
 import wx
 import wx.wizard as wiz     # wxPython wizard class
 import bosh, balt, bolt, bush
+from bolt_module.paths import GPath
 from balt import vspace, hspace
 from env import get_file_version
 import StringIO
@@ -496,7 +497,7 @@ class PageFinish(PageInstaller):
 
     def OnSelectIni(self, event):
         index = event.GetSelection()
-        ini_path = bolt.GPath(self.listInis.GetString(index))
+        ini_path = GPath(self.listInis.GetString(index))
         lines = generateTweakLines(self.parent.ret.IniEdits[ini_path],ini_path)
         self.listTweaks.Set(lines)
         self.listInis.SetSelection(index)
@@ -769,7 +770,7 @@ class WryeParser(ScriptParser.Parser):
             self.parent = parent
             self.installer = installer
             self.bArchive = isinstance(installer, bosh.InstallerArchive)
-            self._path = bolt.GPath(installer.archive) if installer else None
+            self._path = GPath(installer.archive) if installer else None
             if installer and installer.fileRootIdex:
                 root_path = installer.extras_dict.get('root_path', u'')
                 self._path = self._path.join(root_path)
@@ -1104,19 +1105,19 @@ class WryeParser(ScriptParser.Parser):
         for filename in filenames:
             if not bass.dirs['mods'].join(filename).exists():
                 # Check for ghosted mods
-                if bolt.GPath(filename) in bosh.modInfos:
+                if GPath(filename) in bosh.modInfos:
                     return True # It's a ghosted mod
                 return False
         return True
     def fnGetEspmStatus(self, filename):
-        file = bolt.GPath(filename)
+        file = GPath(filename)
         if file in bosh.modInfos.merged: return 3   # Merged
         if load_order.cached_is_active(file): return 2  # Active
         if file in bosh.modInfos.imported: return 1 # Imported (not active/merged)
         if file in bosh.modInfos: return 0          # Inactive
         return -1                                   # Not found
     def fnEditINI(self, iniName, section, setting, value, comment=None):
-        iniPath = bolt.GPath(iniName)
+        iniPath = GPath(iniName)
         #--Section
         section = section.strip()
         realSection = OBSEIniFile.ci_pseudosections.get(section, section)
@@ -1133,7 +1134,7 @@ class WryeParser(ScriptParser.Parser):
             setting, value, comment, False)
 
     def fnDisableINILine(self, iniName, section, setting):
-        iniPath = bolt.GPath(iniName)
+        iniPath = GPath(iniName)
         #--Section:
         section = section.strip()
         realSection = OBSEIniFile.ci_pseudosections.get(section, section)
@@ -1201,13 +1202,13 @@ class WryeParser(ScriptParser.Parser):
         return String.rfind(sub, start, end)
     def fnGetFilename(self, String):
         try:
-            abspath = bolt.GPath(String)
+            abspath = GPath(String)
             return abspath.stail
         except:
             return u''
     def fnGetFolder(self, String):
         try:
-            abspath = bolt.GPath(String)
+            abspath = GPath(String)
             return abspath.shead
         except:
             return u''
@@ -1354,7 +1355,7 @@ class WryeParser(ScriptParser.Parser):
                 else:
                     # Archive
                     for file_, _size, _crc in self.installer.fileSizeCrcs:
-                        rel = bolt.GPath(file_).relpath(subpackage)
+                        rel = GPath(file_).relpath(subpackage)
                         if not rel.s.startswith(u'..'):
                             List.append(rel.s)
                 List.sort()

@@ -46,7 +46,8 @@ import bass # for settings (duh!)
 import bolt
 import initialization
 from bass import dirs, AppVersion
-from bolt import GPath, deprint
+from bolt import deprint
+from bolt_module.paths import GPath, Path
 from exception import BoltError, StateError, raise_bolt_error
 
 def _init_settings_files(fsName_):
@@ -146,7 +147,7 @@ class BackupSettings(object):
     def backup_settings(self, balt_):
         deprint(u'')
         deprint(_(u'BACKUP BASH SETTINGS: ') + self._backup_dest_file.s)
-        temp_settings_backup_dir = bolt.Path.tempDir()
+        temp_settings_backup_dir = Path.tempDir()
         try:
             self._backup_settings(temp_settings_backup_dir)
             self._backup_success(balt_)
@@ -213,7 +214,7 @@ class RestoreSettings(object):
         the backup file is a dir we assume it was created by us before
         restarting."""
         if self._settings_file.isfile():
-            temp_dir = bolt.Path.tempDir(prefix=RestoreSettings.__tmpdir_prefix)
+            temp_dir = Path.tempDir(prefix=RestoreSettings.__tmpdir_prefix)
             archives.extract7z(self._settings_file, temp_dir)
             self._extract_dir = temp_dir
         elif self._settings_file.isdir():
@@ -355,7 +356,7 @@ class RestoreSettings(object):
             GPath(self._timestamped_old).copyTo(u'bash.ini')
         elif self._bash_ini_path:
             # remove bash.ini as it is the one from the backup
-            bolt.GPath(u'bash.ini').remove()
+            GPath(u'bash.ini').remove()
 
     @staticmethod
     def warn_message(balt_, msg=u''):

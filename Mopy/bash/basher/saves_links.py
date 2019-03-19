@@ -33,7 +33,8 @@ from .dialogs import ImportFaceDialog
 from .. import bass, bosh, bolt, balt, bush, parsers, load_order, initialization
 from ..balt import EnabledLink, AppendableLink, Link, CheckLink, ChoiceLink, \
     ItemLink, SeparatorLink, OneItemLink, Image, UIList_Rename
-from ..bolt import GPath, SubProgress, formatInteger, struct_pack, struct_unpack
+from ..bolt import SubProgress, formatInteger, struct_pack, struct_unpack
+from ..bolt_module.paths import GPath
 from ..bosh import faces
 from ..exception import ArgumentError, BoltError, CancelError, ModError
 

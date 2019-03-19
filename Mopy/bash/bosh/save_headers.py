@@ -41,6 +41,7 @@ from ..bolt import cstrip, unpack_string, unpack_int, unpack_str8, \
     struct_unpack, unpack_int_delim, unpack_str16_delim, unpack_byte_delim, \
     unpack_many
 from ..bolt_module import unicode_utils
+from ..bolt_module.paths import GPath
 from ..bolt_module.unicode_utils import decode
 from ..exception import SaveHeaderError, raise_bolt_error
 
@@ -83,7 +84,7 @@ class SaveFileHeader(object):
         self.pcLocation = decode(cstrip(self.pcLocation),
                                  unicode_utils.pluginEncoding,
                                  avoidEncodings=('utf8', 'utf-8'))
-        self.masters = [bolt.GPath(decode(x)) for x in self.masters]
+        self.masters = [GPath(decode(x)) for x in self.masters]
 
     def load_image_data(self, ins):
         self.ssData = ins.read(3 * self.ssWidth * self.ssHeight)

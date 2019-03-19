@@ -30,7 +30,8 @@ import sys
 from .. import bolt, archives, bass
 from ..archives import defaultExt, readExts, compressionSettings, \
     compressCommand
-from ..bolt import DataDict, PickleDict, GPath, Path, sio, SubProgress
+from ..bolt import DataDict, PickleDict, sio, SubProgress
+from ..bolt_module.paths import GPath, Path
 from ..exception import ArgumentError, StateError
 
 converters_dir = None
@@ -258,7 +259,7 @@ class InstallerConverter(object):
             self.build(srcArchives, idata, destArchive, BCFArchive, blockSize,
                        progress, crc_installer)
             self.crc = self.fullPath.crc
-        elif isinstance(srcArchives, bolt.Path):
+        elif isinstance(srcArchives, Path):
             #--Load a BCF from file
             self.fullPath = converters_dir.join(srcArchives)
             self.load()
@@ -560,7 +561,7 @@ class InstallerConverter(object):
         if not fileNames: raise ArgumentError(
                 u"No files to extract for %s." % srcInstaller)
         tmpDir = bass.getTempDir()
-        tempList = bolt.Path.baseTempDir().join(u'WryeBash_listfile.txt')
+        tempList = Path.baseTempDir().join(u'WryeBash_listfile.txt')
         #--Dump file list
         try:
             with tempList.open('w', encoding='utf-8-sig') as out:

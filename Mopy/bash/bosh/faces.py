@@ -23,7 +23,8 @@
 # =============================================================================
 import re
 from .. import bass, bush, bolt
-from ..bolt import Flags, sio, Path, struct_pack, struct_unpack
+from ..bolt import Flags, sio, struct_pack, struct_unpack
+from ..bolt_module.paths import Path
 from ..bolt_module.unicode_utils import encode
 from ..exception import SaveFileError, StateError
 from . import SaveInfo

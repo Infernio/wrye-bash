@@ -31,7 +31,8 @@ from ..base import AMultiTweakItem, AMultiTweaker, Patcher, CBash_Patcher, \
     AAliasesPatcher, AListPatcher, AImportPatcher, APatchMerger, \
     AUpdateReferences
 from ... import bosh, load_order, bush  # for bosh.modInfos
-from ...bolt import GPath, CsvReader
+from ...bolt import CsvReader
+from ...bolt_module.paths import GPath
 from ...brec import MreRecord
 
 # Patchers 1 ------------------------------------------------------------------

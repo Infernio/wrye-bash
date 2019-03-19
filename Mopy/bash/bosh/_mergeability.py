@@ -23,7 +23,7 @@
 # =============================================================================
 """Tmp module to get mergeability stuff out of bosh.__init__.py."""
 from .. import bass, bush
-from ..bolt import GPath
+from ..bolt_module.paths import GPath
 from ..cint import ObCollection
 from ..exception import ModError
 from ..load_order import cached_is_active

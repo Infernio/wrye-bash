@@ -44,8 +44,9 @@ from .. import bass, bolt, bosh, bush, balt, archives
 from ..balt import EnabledLink, CheckLink, AppendableLink, OneItemLink, \
     UIList_Rename, UIList_Hide
 from ..belt import InstallerWizard, generateTweakLines
-from ..bolt import GPath, deprint, SubProgress, LogFile, formatInteger, \
+from ..bolt import deprint, SubProgress, LogFile, formatInteger, \
     round_size
+from ..bolt_module.paths import GPath
 from ..exception import CancelError, SkipError, StateError
 
 __all__ = ['Installer_Open', 'Installer_Duplicate', 'InstallerOpenAt_MainMenu',
@@ -114,7 +115,7 @@ class _InstallerLink(Installers_Link, EnabledLink):
         self.window.RefreshUI(detail_item=archive_path)
 
     def _askFilename(self, message, filename):
-        """:rtype: bolt.Path"""
+        """:rtype: bolt_module.paths.Path"""
         result = self._askText(message, title=self.dialogTitle,
                                default=filename)
         if not result: return

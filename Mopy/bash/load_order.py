@@ -48,6 +48,7 @@ import time
 import balt
 import bass
 import bolt
+from bolt_module.paths import Path
 import bush
 import exception
 # Game instance providing load order operations API
@@ -121,7 +122,7 @@ class LoadOrder(object):
     def lorder(self, paths):
         """Return a tuple containing the given paths in their load order.
         :param paths: iterable of paths that must all have a load order
-        :type paths: collections.Iterable[bolt.Path]
+        :type paths: collections.Iterable[Path]
         :rtype: tuple
         """
         return tuple(sorted(paths, key=self.__mod_loIndex.__getitem__))
@@ -184,7 +185,7 @@ def _keep_max(max_to_keep, length):
 # Load Order utility methods - make sure the cache is valid when using them
 def cached_active_tuple():
     """Return the currently cached active mods in load order as a tuple.
-    :rtype : tuple[bolt.Path]
+    :rtype : tuple[Path]
     """
     return cached_lord.activeOrdered
 
@@ -212,8 +213,8 @@ def get_ordered(mod_names):
     If some elements do not have a load order they are appended to the list
     in alphabetical, case insensitive order (used also to resolve
     modification time conflicts).
-    :type mod_names: collections.Iterable[bolt.Path]
-    :rtype : list[bolt.Path]
+    :type mod_names: collections.Iterable[Path]
+    :rtype: list[Path]
     """
     mod_names = list(mod_names)
     mod_names.sort() # resolve time conflicts or no load order
@@ -243,8 +244,8 @@ def save_lo(lord, acti=None, __index_move=0, quiet=False):
 
 def _update_cache(lord=None, acti_sorted=None, __index_move=0):
     """
-    :type lord: tuple[bolt.Path] | list[bolt.Path]
-    :type acti_sorted: tuple[bolt.Path] | list[bolt.Path]
+    :type lord: tuple[Path] | list[Path]
+    :type acti_sorted: tuple[Path] | list[Path]
     """
     global cached_lord
     try:

@@ -25,11 +25,12 @@
 import re
 import string
 import wx
+
 from .. import bass, balt, bosh, bolt, load_order
 from ..balt import TextCtrl, StaticText, vSizer, hSizer, hspacer, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, hspace, \
     vspace, BaltFrame, Resources, HtmlCtrl
-from ..bolt import GPath
+from ..bolt_module.paths import GPath, Path
 from ..bosh import omods
 from ..exception import BoltError
 
@@ -49,7 +50,7 @@ class DocBrowser(BaltFrame):
         self.docIsWtxt = False
         #--Clean data
         for key,doc in self.docs.items():
-            if not isinstance(doc,bolt.Path):
+            if not isinstance(doc, Path):
                 self.docs[key] = GPath(doc)
         #--Singleton
         Link.Frame.docBrowser = self

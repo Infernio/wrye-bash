@@ -23,12 +23,13 @@
 # =============================================================================
 import subprocess
 import webbrowser
+
 from . import BashStatusBar, BashFrame
 from .frames import ModChecker, DocBrowser
-from .. import bass, bosh, bolt, balt, bush, parsers, load_order
+from .. import bass, bosh, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, Links, bitmapButton, \
     SeparatorLink, tooltip, BoolLink, staticBitmap
-from ..bolt import GPath
+from ..bolt_module.paths import GPath, Path
 from ..exception import AbstractError
 from ..env import getJava
 
@@ -228,7 +229,7 @@ class App_Button(StatusBar_Button):
         if self.isShortcut or self.isFolder:
             webbrowser.open(self.exePath.s)
         elif self.isJava:
-            cwd = bolt.Path.getcwd()
+            cwd = Path.getcwd()
             if self.workingDir:
                 self.workingDir.setcwd()
             else:
@@ -266,7 +267,7 @@ class App_Button(StatusBar_Button):
             args.extend(self.exeArgs)
             if self.extraArgs: args.extend(self.extraArgs)
             Link.Frame.SetStatusInfo(u' '.join(args[1:]))
-            cwd = bolt.Path.getcwd()
+            cwd = Path.getcwd()
             if self.workingDir:
                 self.workingDir.setcwd()
             else:
@@ -292,7 +293,7 @@ class App_Button(StatusBar_Button):
             finally:
                 cwd.setcwd()
         else:
-            dir_ = self.workingDir.s if self.workingDir else bolt.Path.getcwd().s
+            dir_ = self.workingDir.s if self.workingDir else Path.getcwd().s
             args = u'"%s"' % self.exePath.s
             args += u' '.join([u'%s' % arg for arg in self.exeArgs])
             try:
@@ -312,7 +313,7 @@ class App_Button(StatusBar_Button):
                     # Most likely we're here because FindExecutable failed (no file association)
                     # Or because win32api import failed.  Try doing it using os.startfile
                     # ...Changed to webbrowser.open because os.startfile is windows specific and is not cross platform compatible
-                    cwd = bolt.Path.getcwd()
+                    cwd = Path.getcwd()
                     if self.workingDir:
                         self.workingDir.setcwd()
                     else:

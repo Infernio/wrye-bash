@@ -39,7 +39,9 @@ from .. import bass, bosh, bolt, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, TextCtrl, toggleButton, vSizer, hspacer, \
     StaticText, CheckLink, EnabledLink, AppendableLink, TransLink, RadioLink, \
     SeparatorLink, ChoiceLink, OneItemLink, Image, ListBoxes, OkButton
-from ..bolt import GPath, SubProgress, formatDate
+from ..bolt import SubProgress, formatDate
+from ..bolt_module import paths
+from ..bolt_module.paths import GPath
 from ..bosh import faces
 from ..cint import CBashApi, FormID
 from ..exception import AbstractError, BoltError, CancelError
@@ -938,7 +940,7 @@ class _Mod_Patch_Update(_Mod_BP_Link):
 
     def _Execute(self):
         # Clean up some memory
-        bolt.GPathPurge()
+        paths.GPathPurge()
         # We need active mods
         if not load_order.cached_active_tuple():
             self._showWarning(

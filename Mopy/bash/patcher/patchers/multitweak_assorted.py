@@ -28,7 +28,7 @@ import collections
 import random
 import re
 # Internal
-from ...bolt import GPath
+from ...bolt_module.paths import GPath
 from ...brec import MreRecord
 from ... import load_order
 from ... import bush # from ....bush import game ? # should be set by now !

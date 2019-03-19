@@ -25,9 +25,11 @@
 import string
 from types import IntType, LongType
 import wx
+
 from . import bEnableWizard, tabInfo, BashFrame
 from .constants import colorInfo, settingDefaults, installercons
-from .. import bass, balt, bosh, bolt, bush, env
+from .. import bass, balt, bosh, bush, env
+from ..bolt_module import paths
 from ..balt import Button, hSizer, Link, colors, RoTextCtrl, vSizer, hspacer, \
     checkBox, StaticText, Image, bell, TextCtrl, tooltip, OkButton, \
     CancelButton, ApplyButton, hspace, vspace, Resources
@@ -418,7 +420,7 @@ class CreateNewProject(balt.Dialog):
         self.OnCheckBoxChange()
 
     def OnCheckProjectsColorTextCtrl(self,event):
-        projectName = bolt.GPath(self.textName.GetValue())
+        projectName = paths.GPath(self.textName.GetValue())
         if projectName in self.existingProjects: #Fill this in. Compare this with the self.existingprojects list
             self.textName.SetBackgroundColour('#FF0000')
             self.textName.SetToolTip(tooltip(_(u'There is already a project with that name!')))
@@ -446,7 +448,7 @@ class CreateNewProject(balt.Dialog):
 
     def OnClose(self, event):
         """ Create the New Project and add user specified extras. """
-        projectName = bolt.GPath(self.textName.GetValue().strip())
+        projectName = paths.GPath(self.textName.GetValue().strip())
         projectDir = bass.dirs['installers'].join(projectName)
 
         if projectDir.exists():
@@ -458,7 +460,7 @@ class CreateNewProject(balt.Dialog):
 
         # Create project in temp directory, so we can move it via
         # Shell commands (UAC workaround)
-        tmpDir = bolt.Path.tempDir()
+        tmpDir = paths.Path.tempDir()
         tempProject = tmpDir.join(projectName)
         if self.checkEsp.IsChecked():
             fileName = u'Blank, %s.esp' % bush.game.fsName

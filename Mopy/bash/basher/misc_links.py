@@ -27,8 +27,8 @@ import time
 from ..balt import EnabledLink, AppendableLink, ItemLink, RadioLink, \
     ChoiceLink, MenuLink, CheckLink, Image, UIList_Rename, OneItemLink
 from .. import bass, balt, bosh, bush
+from ..bolt_module.paths import GPath
 from .import People_Link, SaveDetails
-from ..bolt import GPath
 
 __all__ = ['ColumnsMenu', 'Master_ChangeTo', 'Master_Disable',
            'Screens_NextScreenShot', 'Screen_JpgQuality',

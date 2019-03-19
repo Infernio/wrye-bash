@@ -67,8 +67,10 @@ import wx
 
 #--Local
 from .. import bush, bosh, bolt, bass, env, load_order, archives
-from ..bolt import GPath, SubProgress, deprint, formatInteger, formatDate, \
+from ..bolt import SubProgress, deprint, formatInteger, formatDate, \
     round_size
+from ..bolt_module import paths
+from ..bolt_module.paths import GPath
 from ..bosh import omods
 from ..cint import CBashApi
 from ..exception import AbstractError, BoltError, CancelError, FileError, \
@@ -1104,7 +1106,7 @@ class _DetailsMixin(object):
     # Details panel API
     def SetFile(self, fileName='SAME'):
         """Set file to be viewed. Leave fileName empty to reset.
-        :type fileName: basestring | bolt.Path | None
+        :type fileName: basestring | paths.Path | None
         """
         #--Reset?
         if fileName == 'SAME':
@@ -1630,7 +1632,7 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
     @property
     def target_inis(self):
         """Return settings['bash.ini.choices'], set in IniInfos#__init__.
-        :rtype: OrderedDict[unicode, bolt.Path]"""
+        :rtype: OrderedDict[unicode, paths.Path]"""
         return settings['bash.ini.choices']
 
     @property
@@ -3085,7 +3087,7 @@ class ScreensDetails(_DetailsMixin, NotebookPanel):
     def __init__(self, parent):
         super(ScreensDetails, self).__init__(parent)
         self.screenshot_control = balt.Picture(parent, 256, 192, background=colors['screens.bkgd.image'])
-        self.displayed_screen = None # type: bolt.Path
+        self.displayed_screen = None # type: paths.Path
         self.SetSizer(hSizer((self.screenshot_control,1,wx.GROW)))
 
     @property
@@ -3517,7 +3519,7 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
     def OnShowPage(self,event):
         """Call panel's ShowPanel() and set the current panel."""
         if event.GetId() == self.GetId(): ##: why ?
-            bolt.GPathPurge()
+            paths.GPathPurge()
             self.currentPage = self.GetPage(event.GetSelection())
             self.currentPage.ShowPanel()
             event.Skip() ##: shouldn't this always be called ?
@@ -3923,7 +3925,7 @@ class BashFrame(BaltFrame):
     def SaveSettings(self, destroy=False):
         """Save application data."""
         # Purge some memory
-        bolt.GPathPurge()
+        paths.GPathPurge()
         # Clean out unneeded settings
         self.CleanSettings()
         if Link.Frame.docBrowser: Link.Frame.docBrowser.DoSave()
@@ -4071,7 +4073,7 @@ class BashApp(wx.App):
             #--Mod table data
             modTableData = bosh.modInfos.table.data
             for key in modTableData.keys():
-                if not isinstance(key,bolt.Path):
+                if not isinstance(key, paths.Path):
                     modTableData[GPath(key)] = modTableData[key]
                     del modTableData[key]
         #--Window sizes by class name rather than by class

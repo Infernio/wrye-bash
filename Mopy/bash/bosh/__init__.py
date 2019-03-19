@@ -49,8 +49,9 @@ from .. import bass, bolt, balt, bush, env, load_order, archives, \
 from .. import patcher # for configIsCBash()
 from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
-from ..bolt import GPath, DataDict, deprint, sio, Path, struct_pack, \
+from ..bolt import DataDict, deprint, sio, struct_pack, \
     struct_unpack
+from ..bolt_module.paths import GPath, Path
 from ..bolt_module.unicode_utils import decode
 from ..brec import MreRecord, ModReader
 from ..cint import CBashApi
@@ -127,12 +128,12 @@ class CoSaves:
     @staticmethod
     def copy(src_path, savePath, saveName=None):
         """Copies cofiles."""
-        CoSaves._recopy(src_path, savePath, saveName, bolt.Path.copyTo)
+        CoSaves._recopy(src_path, savePath, saveName, Path.copyTo)
 
     @staticmethod
     def move(src_path, savePath, saveName=None):
         """Renames cofiles."""
-        CoSaves._recopy(src_path, savePath, saveName, bolt.Path.moveTo)
+        CoSaves._recopy(src_path, savePath, saveName, Path.moveTo)
 
     @staticmethod
     def get_new_paths(old_path, new_path):
@@ -1120,13 +1121,13 @@ class DataStore(DataDict):
     @property
     def bash_dir(self):
         """Return the folder where Bash persists its data - create it on init!
-        :rtype: bolt.Path"""
+        :rtype: Path"""
         raise AbstractError
 
     @property
     def hidden_dir(self):
         """Return the folder where Bash should move the file info to hide it
-        :rtype: bolt.Path"""
+        :rtype: Path"""
         return self.bash_dir.join(u'Hidden')
 
     def get_hide_dir(self, name): return self.hidden_dir
@@ -1179,7 +1180,7 @@ class TableFileInfos(DataStore):
     @classmethod
     def rightFileType(cls, fileName):
         """Check if the filetype (extension) is correct for subclass.
-        :type fileName: bolt.Path | basestring
+        :type fileName: Path | basestring
         :rtype: _sre.SRE_Match | None
         """
         return cls.file_pattern.search(u'%s' % fileName)
@@ -1219,8 +1220,8 @@ class TableFileInfos(DataStore):
 
     def _notify_bain(self, deleted=frozenset(), changed=frozenset()):
         """We need absolute paths for deleted and changed!
-        :type deleted: set[bolt.Path]
-        :type changed: set[bolt.Path]"""
+        :type deleted: set[Path]
+        :type changed: set[Path]"""
         if self.__class__._bain_notify:
             from .bain import InstallersData
             InstallersData.notify_external(deleted=deleted, changed=changed)
@@ -1383,7 +1384,7 @@ def ini_info_factory(fullpath, load_cache='Ignored'):
 
 class INIInfos(TableFileInfos):
     """:type _ini: IniFile
-    :type data: dict[bolt.Path, IniInfo]"""
+    :type data: dict[Path, IniInfo]"""
     file_pattern = re.compile(ur'\.ini$', re.I | re.U)
 
     def __init__(self):
@@ -1415,7 +1416,7 @@ class INIInfos(TableFileInfos):
             # will still be in here, but in English.  It wont get picked
             # up by the previous check, so we'll just delete any non-Path
             # objects.  That will take care of it.
-            if not isinstance(ini_path,bolt.Path) or not ini_path.isfile():
+            if not isinstance(ini_path, Path) or not ini_path.isfile():
                 if get_game_ini(ini_path):
                     continue # don't remove game inis even if missing
                 del _target_inis[ini_name]
@@ -1444,7 +1445,7 @@ class INIInfos(TableFileInfos):
         return self._ini
     @ini.setter
     def ini(self, ini_path):
-        """:type ini_path: bolt.Path"""
+        """:type ini_path: Path"""
         if self._ini is not None and self._ini.abs_path == ini_path:
             return # nothing to do
         self._ini = BestIniFile(ini_path)
@@ -3046,7 +3047,7 @@ def initOptions(bashIni):
     initDefaultSettings()
 
     defaultOptions = {}
-    type_key = {str:u's',unicode:u's',list:u's',int:u'i',bool:u'b',bolt.Path:u's'}
+    type_key = {str:u's',unicode:u's',list:u's',int:u'i',bool:u'b',Path:u's'}
     allOptions = [tooldirs, inisettings]
     unknownSettings = {}
     for settingsDict in allOptions:
@@ -3063,7 +3064,7 @@ def initOptions(bashIni):
                 usedKey, usedSettings = defaultOptions.get(key,(key[1:],unknownSettings))
                 defaultValue = usedSettings.get(usedKey,u'')
                 settingType = type(defaultValue)
-                if settingType in (bolt.Path,list):
+                if settingType in (Path, list):
                     if value == u'.': continue
                     value = GPath(value)
                     if not value.isabs():

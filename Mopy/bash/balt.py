@@ -29,7 +29,8 @@ import bass # for dirs - try to avoid
 #--Localization
 #..Handled by bolt, so import that.
 import bolt
-from bolt import GPath, deprint
+from bolt import deprint
+from bolt_module.paths import GPath, Path
 from exception import AbstractError, AccessDeniedError, ArgumentError, \
     BoltError, CancelError, SkipError, StateError
 #--Python
@@ -909,11 +910,11 @@ class WryeLog(_Log):
                  fixedFont=False, log_icons=None):
         """Convert logText from wtxt to html and display. Optionally,
         logText can be path to an html file."""
-        if isinstance(logText, bolt.Path):
+        if isinstance(logText, Path):
             logPath = logText
         else:
             logPath = _settings.get('balt.WryeLog.temp',
-                bolt.Path.getcwd().join(u'WryeLogTemp.html'))
+                                    Path.getcwd().join(u'WryeLogTemp.html'))
             convert_wtext_to_html(logPath, logText)
         if _wx_lib_iewin is None:
             # Comtypes not available most likely! so do it this way:
@@ -1435,9 +1436,9 @@ class ListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
         self.fnDndAllow = fnDndAllow
         #--Item/Id mapping
         self._item_itemId = {}
-        """:type : dict[bolt.Path | basestring | int, long]"""
+        """:type : dict[Path | basestring | int, long]"""
         self._itemId_item = {}
-        """:type : dict[long, bolt.Path | basestring | int]"""
+        """:type : dict[long, Path | basestring | int]"""
 
     def OnDragging(self,x,y,dragResult):
         # We're dragging, see if we need to scroll the list
@@ -1742,7 +1743,7 @@ class UIList(wx.Panel):
         specified.
         :param itemDex: the index of the item in the list - must be given if
         item is None
-        :param item: a bolt.Path or an int (Masters) or a string (People),
+        :param item: a Path or an int (Masters) or a string (People),
         the key in self.data
         """
         insert = False
@@ -2113,7 +2114,7 @@ class UIList(wx.Panel):
     #--Item/Index Translation -------------------------------------------------
     def GetItem(self,index):
         """Return item (key in self.data_store) for specified list index.
-        :rtype: bolt.Path | basestring | int
+        :rtype: Path | basestring | int
         """
         return self.__gList.FindItemAt(index)
 
@@ -2190,7 +2191,7 @@ class UIList(wx.Panel):
             msg = _(u'Empty name !')
             maPattern = None
         else:
-            char = is_filename and bolt.Path.has_invalid_chars(newName)
+            char = is_filename and Path.has_invalid_chars(newName)
             if char:
                 msg = _(u'%(new_name)s contains invalid character (%(char)s)'
                         ) % {'new_name': newName, 'char': char}

@@ -32,7 +32,7 @@ from this module outside of the patcher package."""
 # instance Patcher.buildPatch() apparently is NOT always overridden
 
 from . import getPatchesList
-from .. import load_order, bosh, bolt
+from .. import load_order, bosh
 
 #------------------------------------------------------------------------------
 # _Abstract_Patcher and subclasses---------------------------------------------
@@ -137,7 +137,7 @@ class CBash_Patcher(_Abstract_Patcher):
 class AListPatcher(_Abstract_Patcher):
     """Subclass for patchers that have GUI lists of objects.
 
-    :type _patches_set: set[bolt.Path]"""
+    :type _patches_set: set[bolt_module.paths.Path]"""
     #--Get/Save Config
     autoKey = None
     # log header to be used if the ListPatcher has mods/files source files
