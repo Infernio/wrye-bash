@@ -39,7 +39,7 @@ import load_order
 from balt import Progress
 from bolt import GPath, deprint, CsvReader, csvFormat, SubProgress, \
     struct_pack, struct_unpack
-from bolt_module.unicode_helpers import decode
+from bolt_module.unicode_utils import decode
 from bass import dirs, inisettings
 from brec import MreRecord, MelObject, _coerce, genFid, ModReader, ModWriter, \
     RecordHeader

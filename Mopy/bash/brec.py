@@ -36,8 +36,8 @@ import bolt
 import exception
 from bass import null1
 from bolt import sio, GPath, struct_pack, struct_unpack
-from bolt_module import unicode_helpers
-from bolt_module.unicode_helpers import decode, encode
+from bolt_module import unicode_utils
+from bolt_module.unicode_utils import decode, encode
 
 # Util Functions --------------------------------------------------------------
 #--Type coercion
@@ -299,12 +299,12 @@ class ModReader:
 
     def readString(self,size,recType='----'):
         """Read string from file, stripping zero terminator."""
-        return u'\n'.join(decode(x,unicode_helpers.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
+        return u'\n'.join(decode(x, unicode_utils.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
                           bolt.cstrip(self.read(size,recType)).split('\n'))
 
     def readStrings(self,size,recType='----'):
         """Read strings from file, stripping zero terminator."""
-        return [decode(x,unicode_helpers.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
+        return [decode(x, unicode_utils.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
                 self.read(size,recType).rstrip(null1).split(null1)]
 
     def unpack(self,format,size,recType='----'):
@@ -403,7 +403,7 @@ class ModWriter:
         stream."""
         if data is None: return
         elif isinstance(data,unicode):
-            data = encode(data,firstEncoding=unicode_helpers.pluginEncoding)
+            data = encode(data, firstEncoding=unicode_utils.pluginEncoding)
         lenData = len(data) + 1
         outWrite = self.out.write
         if lenData < 0xFFFF:
@@ -852,7 +852,7 @@ class MelString(MelBase):
         """Dumps data from record to outstream."""
         value = record.__getattribute__(self.attr)
         if value is not None:
-            firstEncoding = unicode_helpers.pluginEncoding
+            firstEncoding = unicode_utils.pluginEncoding
             if self.maxSize:
                 value = bolt.winNewLines(value.rstrip())
                 size = min(self.maxSize,len(value))
@@ -942,7 +942,8 @@ class MelStrings(MelString):
         """Dumps data from record to outstream."""
         strings = record.__getattribute__(self.attr)
         if strings:
-            out.packSub0(self.subType,null1.join(encode(x, firstEncoding=unicode_helpers.pluginEncoding) for x in strings) + null1)
+            out.packSub0(self.subType, null1.join(encode(x, firstEncoding
+            =unicode_utils.pluginEncoding) for x in strings) + null1)
 
 #------------------------------------------------------------------------------
 class MelStruct(MelBase):

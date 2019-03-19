@@ -45,23 +45,23 @@ try:
     #See if cint is being used by Wrye Bash
     from bolt import CBash as CBashEnabled
     from bolt import GPath, deprint, Path
-    from bolt_module import unicode_helpers
-    from bolt_module.unicode_helpers import decode as _uni, encode as _enc
+    from bolt_module import unicode_utils
+    from bolt_module.unicode_utils import decode as _uni, encode as _enc
     import bolt
     def _encode(text,*args,**kwdargs):
         if len(args) > 1:
             args = list(args)
-            args[1] = unicode_helpers.pluginEncoding
+            args[1] = unicode_utils.pluginEncoding
         else:
-            kwdargs['firstEncoding'] = unicode_helpers.pluginEncoding
+            kwdargs['firstEncoding'] = unicode_utils.pluginEncoding
         if isinstance(text,Path): text = text.s
         return _enc(text,*args,**kwdargs)
     def _unicode(text,*args,**kwdargs):
         if args:
             args = list(args)
-            args[1] = unicode_helpers.pluginEncoding
+            args[1] = unicode_utils.pluginEncoding
         else:
-            kwdargs['encoding'] = unicode_helpers.pluginEncoding
+            kwdargs['encoding'] = unicode_utils.pluginEncoding
         return _uni(text,*args,**kwdargs)
 except:
     #It isn't, so replace the imported items with bare definitions

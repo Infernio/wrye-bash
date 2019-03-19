@@ -33,7 +33,7 @@ from ... import bush
 from ...bass import null1, null2, null3, null4
 from ...bolt import Flags, sio, DataDict, winNewLines, struct_pack, \
     struct_unpack
-from ...bolt_module.unicode_helpers import encode
+from ...bolt_module.unicode_utils import encode
 from ...brec import MelRecord, MelStructs, MelObject, MelGroups, MelStruct, \
     FID, MelGroup, MelString, MreLeveledListBase, MelSet, MelFid, MelNull, \
     MelOptStruct, MelFids, MreHeaderBase, MelBase, MelUnicode, MelFidList, \

@@ -24,7 +24,7 @@
 import re
 from .. import bass, bush, bolt
 from ..bolt import Flags, sio, Path, struct_pack, struct_unpack
-from ..bolt_module.unicode_helpers import encode
+from ..bolt_module.unicode_utils import encode
 from ..exception import SaveFileError, StateError
 from . import SaveInfo
 from ._saves import SreNPC, SaveFile

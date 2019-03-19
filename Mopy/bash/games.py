@@ -35,7 +35,7 @@ from collections import defaultdict
 # Local
 import bass
 import bolt
-from bolt_module import unicode_helpers
+from bolt_module import unicode_utils
 import env
 import exception
 
@@ -57,7 +57,7 @@ def __write_plugins(out, lord, active, _star):
         # plugins.txt.  Even activating through the SkyrimLauncher
         # doesn't work.
         try:
-            out.write(asterisk() + unicode_helpers.encode(mod.s, firstEncoding='cp1252'))
+            out.write(asterisk() + unicode_utils.encode(mod.s, firstEncoding='cp1252'))
             out.write('\r\n')
         except UnicodeEncodeError:
             bolt.deprint(mod.s + u' failed to properly encode and was not '
@@ -89,7 +89,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
             is_active = not _star or modname.startswith('*')
             if _star and is_active: modname = modname[1:]
             try:
-                test = unicode_helpers.decode(modname, encoding='cp1252')
+                test = unicode_utils.decode(modname, encoding='cp1252')
             except UnicodeError:
                 bolt.deprint(u'%r failed to properly decode' % modname)
                 continue
@@ -97,7 +97,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
                 # The automatic encoding detector could have returned
                 # an encoding it actually wasn't.  Luckily, we
                 # have a way to double check: modInfos.data
-                for encoding in unicode_helpers.encodingOrder:
+                for encoding in unicode_utils.encodingOrder:
                     try:
                         test2 = unicode(modname, encoding)
                         if bolt.GPath(test2) not in mod_infos:

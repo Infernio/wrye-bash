@@ -40,8 +40,8 @@ from ..bolt import cstrip, unpack_string, unpack_int, unpack_str8, \
     unpack_short, unpack_float, unpack_str16, unpack_byte, struct_pack, \
     struct_unpack, unpack_int_delim, unpack_str16_delim, unpack_byte_delim, \
     unpack_many
-from ..bolt_module import unicode_helpers
-from ..bolt_module.unicode_helpers import decode
+from ..bolt_module import unicode_utils
+from ..bolt_module.unicode_utils import decode
 from ..exception import SaveHeaderError, raise_bolt_error
 
 class SaveFileHeader(object):
@@ -81,7 +81,7 @@ class SaveFileHeader(object):
         self.calc_time()
         self.pcName = decode(cstrip(self.pcName))
         self.pcLocation = decode(cstrip(self.pcLocation),
-                                 unicode_helpers.pluginEncoding,
+                                 unicode_utils.pluginEncoding,
                                  avoidEncodings=('utf8', 'utf-8'))
         self.masters = [bolt.GPath(decode(x)) for x in self.masters]
 

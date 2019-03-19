@@ -51,7 +51,7 @@ from itertools import chain
 # Internal
 import bass
 import exception
-from bolt_module.unicode_helpers import decode
+from bolt_module.unicode_utils import decode
 
 # structure aliases, mainly introduced to reduce uses of 'pack' and 'unpack'
 

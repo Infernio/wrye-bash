@@ -32,7 +32,7 @@ from .. import barb, bush, balt, bass, bolt, env, exception
 from ..balt import ItemLink, AppendableLink, RadioLink, CheckLink, MenuLink, \
     TransLink, EnabledLink, BoolLink, tooltip, Link
 from ..bolt import deprint, GPath
-from ..bolt_module import unicode_helpers
+from ..bolt_module import unicode_utils
 from ..exception import BoltError
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 
@@ -348,7 +348,7 @@ class Settings_PluginEncodings(MenuLink):
         }
     def __init__(self):
         super(Settings_PluginEncodings, self).__init__(_(u'Plugin Encoding'))
-        unicode_helpers.pluginEncoding = bass.settings['bash.pluginEncoding'] # TODO(ut): why is this init here ??
+        unicode_utils.pluginEncoding = bass.settings['bash.pluginEncoding'] # TODO(ut): why is this init here ??
         self.links.append(Settings_PluginEncoding(_(u'Automatic'),None))
         # self.links.append(SeparatorLink())
         enc_name = sorted(Settings_PluginEncodings.encodings.items(),key=lambda x: x[1])
@@ -369,7 +369,7 @@ class Settings_PluginEncoding(RadioLink):
 
     def Execute(self):
         bass.settings['bash.pluginEncoding'] = self.encoding
-        unicode_helpers.pluginEncoding = self.encoding
+        unicode_utils.pluginEncoding = self.encoding
 
 #------------------------------------------------------------------------------
 class Settings_Games(MenuLink):

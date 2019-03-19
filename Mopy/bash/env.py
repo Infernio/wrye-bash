@@ -31,7 +31,7 @@ import shutil as _shutil
 import stat
 
 from bolt import GPath, deprint, Path, struct_unpack
-from bolt_module.unicode_helpers import decode
+from bolt_module.unicode_utils import decode
 from exception import BoltError, CancelError, SkipError, AccessDeniedError, \
     DirectoryFileCollisionError, FileOperationError, NonExistentDriveError
 

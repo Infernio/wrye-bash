@@ -28,7 +28,7 @@ import re
 from ._mergeability import is_esl_capable
 from .. import balt, bolt, bush, bass, load_order
 from ..bolt import GPath, deprint, sio, struct_pack, struct_unpack
-from ..bolt_module.unicode_helpers import decode
+from ..bolt_module.unicode_utils import decode
 from ..brec import ModReader, MreRecord
 from ..cint import ObBaseRecord, ObCollection
 from ..exception import BoltError, CancelError, ModError
