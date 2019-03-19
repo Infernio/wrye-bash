@@ -49,8 +49,9 @@ from .. import bass, bolt, balt, bush, env, load_order, archives, \
 from .. import patcher # for configIsCBash()
 from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
-from ..bolt import GPath, DataDict, deprint, sio, Path, decode, struct_pack, \
+from ..bolt import GPath, DataDict, deprint, sio, Path, struct_pack, \
     struct_unpack
+from ..bolt_module.unicode_utils import decode
 from ..brec import MreRecord, ModReader
 from ..cint import CBashApi
 from ..exception import AbstractError, ArgumentError, BoltError, BSAError, \

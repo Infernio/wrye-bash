@@ -50,10 +50,11 @@ from functools import partial
 from itertools import chain
 # Internal
 import bass
-import chardet
 import exception
+from bolt_module.unicode_helpers import decode, encodingOrder, getbestencoding
 
 # structure aliases, mainly introduced to reduce uses of 'pack' and 'unpack'
+
 struct_pack = struct.pack
 struct_unpack = struct.unpack
 
@@ -70,72 +71,6 @@ try:
 except ImportError:
     _walk = walkdir = os.walk
     scandir = None
-
-# Unicode ---------------------------------------------------------------------
-#--decode unicode strings
-#  This is only useful when reading fields from mods, as the encoding is not
-#  known.  For normal filesystem interaction, these functions are not needed
-encodingOrder = (
-    'ascii',    # Plain old ASCII (0-127)
-    'gbk',      # GBK (simplified Chinese + some)
-    'cp932',    # Japanese
-    'cp949',    # Korean
-    'cp1252',   # English (extended ASCII)
-    'utf8',
-    'cp500',
-    'UTF-16LE',
-    )
-if os.name == u'nt':
-    encodingOrder += ('mbcs',)
-
-_encodingSwap = {
-    # The encoding detector reports back some encodings that
-    # are subsets of others.  Use the better encoding when
-    # given the option
-    # 'reported encoding':'actual encoding to use',
-    'GB2312': 'gbk',        # Simplified Chinese
-    'SHIFT_JIS': 'cp932',   # Japanese
-    'windows-1252': 'cp1252',
-    'windows-1251': 'cp1251',
-    'utf-8': 'utf8',
-    }
-
-# Preferred encoding to use when decoding/encoding strings in plugin files
-# None = auto
-# setting it tries the specified encoding first
-pluginEncoding = None
-
-def getbestencoding(bitstream):
-    """Tries to detect the encoding a bitstream was saved in.  Uses Mozilla's
-       detection library to find the best match (heuristics)"""
-    result = chardet.detect(bitstream)
-    encoding_,confidence = result['encoding'],result['confidence']
-    encoding_ = _encodingSwap.get(encoding_,encoding_)
-    ## Debug: uncomment the following to output stats on encoding detection
-    #print
-    #print '%s: %s (%s)' % (repr(bitstream),encoding,confidence)
-    return encoding_,confidence
-
-def decode(byte_str, encoding=None, avoidEncodings=()):
-    """Decode a byte string to unicode, using heuristics on encoding."""
-    if isinstance(byte_str, unicode) or byte_str is None: return byte_str
-    # Try the user specified encoding first
-    # TODO(ut) monkey patch
-    if encoding == 'cp65001':
-        encoding = 'utf-8'
-    if encoding:
-        try: return unicode(byte_str, encoding)
-        except UnicodeDecodeError: pass
-    # Try to detect the encoding next
-    encoding,confidence = getbestencoding(byte_str)
-    if encoding and confidence >= 0.55 and (encoding not in avoidEncodings or confidence == 1.0):
-        try: return unicode(byte_str, encoding)
-        except UnicodeDecodeError: pass
-    # If even that fails, fall back to the old method, trial and error
-    for encoding in encodingOrder:
-        try: return unicode(byte_str, encoding)
-        except UnicodeDecodeError: pass
-    raise UnicodeDecodeError(u'Text could not be decoded using any method')
 
 def encode(text_str, encodings=encodingOrder, firstEncoding=None,
            returnEncoding=False):

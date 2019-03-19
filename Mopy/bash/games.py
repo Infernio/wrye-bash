@@ -35,6 +35,7 @@ from collections import defaultdict
 # Local
 import bass
 import bolt
+from bolt_module import unicode_helpers
 import env
 import exception
 
@@ -88,7 +89,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
             is_active = not _star or modname.startswith('*')
             if _star and is_active: modname = modname[1:]
             try:
-                test = bolt.decode(modname, encoding='cp1252')
+                test = unicode_helpers.decode(modname, encoding='cp1252')
             except UnicodeError:
                 bolt.deprint(u'%r failed to properly decode' % modname)
                 continue
@@ -96,7 +97,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
                 # The automatic encoding detector could have returned
                 # an encoding it actually wasn't.  Luckily, we
                 # have a way to double check: modInfos.data
-                for encoding in bolt.encodingOrder:
+                for encoding in unicode_helpers.encodingOrder:
                     try:
                         test2 = unicode(modname, encoding)
                         if bolt.GPath(test2) not in mod_infos:

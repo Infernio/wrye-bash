@@ -35,7 +35,9 @@ from operator import attrgetter
 import bolt
 import exception
 from bass import null1
-from bolt import decode, encode, sio, GPath, struct_pack, struct_unpack
+from bolt import encode, sio, GPath, struct_pack, struct_unpack
+from bolt_module import unicode_helpers
+from bolt_module.unicode_helpers import decode
 
 # Util Functions --------------------------------------------------------------
 #--Type coercion
@@ -297,12 +299,12 @@ class ModReader:
 
     def readString(self,size,recType='----'):
         """Read string from file, stripping zero terminator."""
-        return u'\n'.join(decode(x,bolt.pluginEncoding,avoidEncodings=('utf8','utf-8')) for x in
+        return u'\n'.join(decode(x,unicode_helpers.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
                           bolt.cstrip(self.read(size,recType)).split('\n'))
 
     def readStrings(self,size,recType='----'):
         """Read strings from file, stripping zero terminator."""
-        return [decode(x,bolt.pluginEncoding,avoidEncodings=('utf8','utf-8')) for x in
+        return [decode(x,unicode_helpers.pluginEncoding, avoidEncodings=('utf8', 'utf-8')) for x in
                 self.read(size,recType).rstrip(null1).split(null1)]
 
     def unpack(self,format,size,recType='----'):
@@ -401,7 +403,7 @@ class ModWriter:
         stream."""
         if data is None: return
         elif isinstance(data,unicode):
-            data = encode(data,firstEncoding=bolt.pluginEncoding)
+            data = encode(data,firstEncoding=unicode_helpers.pluginEncoding)
         lenData = len(data) + 1
         outWrite = self.out.write
         if lenData < 0xFFFF:
@@ -850,7 +852,7 @@ class MelString(MelBase):
         """Dumps data from record to outstream."""
         value = record.__getattribute__(self.attr)
         if value is not None:
-            firstEncoding = bolt.pluginEncoding
+            firstEncoding = unicode_helpers.pluginEncoding
             if self.maxSize:
                 value = bolt.winNewLines(value.rstrip())
                 size = min(self.maxSize,len(value))
@@ -874,7 +876,7 @@ class MelString(MelBase):
 
 #------------------------------------------------------------------------------
 class MelUnicode(MelString):
-    """Like MelString, but instead of using bolt.pluginEncoding to read the
+    """Like MelString, but instead of using unicode_helpers.pluginEncoding to read the
        string, it tries the encoding specified in the constructor instead"""
     def __init__(self, subType, attr, default=None, maxSize=0, encoding=None):
         MelString.__init__(self, subType, attr, default, maxSize)
@@ -940,7 +942,7 @@ class MelStrings(MelString):
         """Dumps data from record to outstream."""
         strings = record.__getattribute__(self.attr)
         if strings:
-            out.packSub0(self.subType,null1.join(encode(x,firstEncoding=bolt.pluginEncoding) for x in strings)+null1)
+            out.packSub0(self.subType,null1.join(encode(x, firstEncoding=unicode_helpers.pluginEncoding) for x in strings) + null1)
 
 #------------------------------------------------------------------------------
 class MelStruct(MelBase):
@@ -1692,7 +1694,7 @@ class MreHeaderBase(MelRecord):
     class MelMasterName(MelBase):
         def setDefault(self,record): record.masters = []
         def loadData(self, record, ins, sub_type, size_, readId):
-            # Don't use ins.readString, becuase it will try to use bolt.pluginEncoding
+            # Don't use ins.readString, becuase it will try to use unicode_helpers.pluginEncoding
             # for the filename.  This is one case where we want to use Automatic
             # encoding detection
             name = decode(bolt.cstrip(ins.read(size_, readId)), avoidEncodings=('utf8', 'utf-8'))

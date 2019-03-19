@@ -29,8 +29,8 @@ from collections import OrderedDict, Counter
 from . import AFile
 from .. import env, bush, balt
 from ..bass import dirs
-from ..bolt import LowerDict, CIstr, deprint, GPath, DefaultLowerDict, \
-    decode, getbestencoding
+from ..bolt import LowerDict, CIstr, deprint, GPath, DefaultLowerDict
+from ..bolt_module.unicode_helpers import getbestencoding, decode
 from ..exception import AbstractError, CancelError, SkipError, BoltError
 
 def _to_lower(ini_settings): # transform dict of dict to LowerDict of LowerDict

@@ -28,6 +28,7 @@ import re
 from ._mergeability import is_esl_capable
 from .. import balt, bolt, bush, bass, load_order
 from ..bolt import GPath, deprint, sio, struct_pack, struct_unpack
+from ..bolt_module.unicode_helpers import decode
 from ..brec import ModReader, MreRecord
 from ..cint import ObBaseRecord, ObCollection
 from ..exception import BoltError, CancelError, ModError
@@ -872,7 +873,7 @@ class ModCleaner:
                                         eid = u''
                                         for subrec in record.subrecords:
                                             if subrec.subType == 'EDID':
-                                                eid = bolt.decode(subrec.data)
+                                                eid = decode(subrec.data)
                                             elif subrec.subType == 'XCLC':
                                                 pos = struct_unpack(
                                                     '=2i', subrec.data[:8])

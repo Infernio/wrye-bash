@@ -30,7 +30,8 @@ import re as _re
 import shutil as _shutil
 import stat
 
-from bolt import GPath, deprint, Path, decode, struct_unpack
+from bolt import GPath, deprint, Path, struct_unpack
+from bolt_module.unicode_helpers import decode
 from exception import BoltError, CancelError, SkipError, AccessDeniedError, \
     DirectoryFileCollisionError, FileOperationError, NonExistentDriveError
 

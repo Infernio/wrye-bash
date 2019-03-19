@@ -46,22 +46,23 @@ try:
     from bolt import CBash as CBashEnabled
     from bolt import GPath, deprint, Path
     from bolt import encode as _enc
-    from bolt import decode as _uni
+    from bolt_module import unicode_helpers
+    from bolt_module.unicode_helpers import decode as _uni
     import bolt
     def _encode(text,*args,**kwdargs):
         if len(args) > 1:
             args = list(args)
-            args[1] = bolt.pluginEncoding
+            args[1] = unicode_helpers.pluginEncoding
         else:
-            kwdargs['firstEncoding'] = bolt.pluginEncoding
+            kwdargs['firstEncoding'] = unicode_helpers.pluginEncoding
         if isinstance(text,Path): text = text.s
         return _enc(text,*args,**kwdargs)
     def _unicode(text,*args,**kwdargs):
         if args:
             args = list(args)
-            args[1] = bolt.pluginEncoding
+            args[1] = unicode_helpers.pluginEncoding
         else:
-            kwdargs['encoding'] = bolt.pluginEncoding
+            kwdargs['encoding'] = unicode_helpers.pluginEncoding
         return _uni(text,*args,**kwdargs)
 except:
     #It isn't, so replace the imported items with bare definitions
@@ -1646,7 +1647,7 @@ class CBashISTRINGARRAY(object):
             _CSetField(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, byref((c_char_p * length)(*nValue)), length)
 
 class CBashIUNICODEARRAY(object):
-    # Almost exactly like CBashISTRINGARRAY, but instead of using the bolt.pluginEncoding
+    # Almost exactly like CBashISTRINGARRAY, but instead of using the unicode_helpers.pluginEncoding
     # for encoding, uses the automatic encoding detection.  Only really useful for TES4
     # record (masters)
     __slots__ = ['_FieldID']
@@ -1917,7 +1918,7 @@ class CBashSTRING(object):
         else: _CSetField(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, _encode(nValue), 0)
 
 class CBashUNICODE(object):
-    # Almost exactly like CBashSTRING, only instead of using the bolt.pluginEncoding
+    # Almost exactly like CBashSTRING, only instead of using the unicode_helpers.pluginEncoding
     # specified encoding first, uses the automatic encoding detection.  Only really
     # useful for the TES4 record
     __slots__ = ['_FieldID']
