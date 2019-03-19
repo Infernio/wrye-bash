@@ -57,7 +57,7 @@ def __write_plugins(out, lord, active, _star):
         # plugins.txt.  Even activating through the SkyrimLauncher
         # doesn't work.
         try:
-            out.write(asterisk() + bolt.encode(mod.s, firstEncoding='cp1252'))
+            out.write(asterisk() + unicode_helpers.encode(mod.s, firstEncoding='cp1252'))
             out.write('\r\n')
         except UnicodeEncodeError:
             bolt.deprint(mod.s + u' failed to properly encode and was not '

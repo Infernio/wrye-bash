@@ -35,9 +35,9 @@ from operator import attrgetter
 import bolt
 import exception
 from bass import null1
-from bolt import encode, sio, GPath, struct_pack, struct_unpack
+from bolt import sio, GPath, struct_pack, struct_unpack
 from bolt_module import unicode_helpers
-from bolt_module.unicode_helpers import decode
+from bolt_module.unicode_helpers import decode, encode
 
 # Util Functions --------------------------------------------------------------
 #--Type coercion

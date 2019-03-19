@@ -29,10 +29,10 @@ from itertools import starmap, repeat
 from operator import attrgetter
 
 from .. import bolt, bush
-from ..bolt import Flags, sio, GPath, deprint, encode, cstrip, \
+from ..bolt import Flags, sio, GPath, deprint, cstrip, \
     SubProgress, unpack_byte, unpack_str8, unpack_many, unpack_int, \
     unpack_short, struct_pack, struct_unpack
-from ..bolt_module.unicode_helpers import decode
+from ..bolt_module.unicode_helpers import decode, encode
 from ..brec import ModReader, MreRecord, ModWriter, getObjectIndex, \
     getFormIndices
 from ..exception import FileError, ModError, StateError

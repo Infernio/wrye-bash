@@ -51,7 +51,7 @@ from itertools import chain
 # Internal
 import bass
 import exception
-from bolt_module.unicode_helpers import decode, encodingOrder, getbestencoding
+from bolt_module.unicode_helpers import decode
 
 # structure aliases, mainly introduced to reduce uses of 'pack' and 'unpack'
 
@@ -71,44 +71,6 @@ try:
 except ImportError:
     _walk = walkdir = os.walk
     scandir = None
-
-def encode(text_str, encodings=encodingOrder, firstEncoding=None,
-           returnEncoding=False):
-    """Encode unicode string to byte string, using heuristics on encoding."""
-    if isinstance(text_str, str) or text_str is None:
-        if returnEncoding: return text_str, None
-        else: return text_str
-    # Try user specified encoding
-    if firstEncoding:
-        try:
-            text_str = text_str.encode(firstEncoding)
-            if returnEncoding: return text_str, firstEncoding
-            else: return text_str
-        except UnicodeEncodeError:
-            pass
-    goodEncoding = None
-    # Try the list of encodings in order
-    for encoding in encodings:
-        try:
-            temp = text_str.encode(encoding)
-            detectedEncoding = getbestencoding(temp)
-            if detectedEncoding[0] == encoding:
-                # This encoding also happens to be detected
-                # By the encoding detector as the same thing,
-                # which means use it!
-                if returnEncoding: return temp,encoding
-                else: return temp
-            # The encoding detector didn't detect it, but
-            # it works, so save it for later
-            if not goodEncoding: goodEncoding = (temp,encoding)
-        except UnicodeEncodeError:
-            pass
-    # Non of the encodings also where detectable via the
-    # detector, so use the first one that encoded without error
-    if goodEncoding:
-        if returnEncoding: return goodEncoding
-        else: return goodEncoding[0]
-    raise UnicodeEncodeError(u'Text could not be encoded using any of the following encodings: %s' % encodings)
 
 def formatInteger(value):
     """Convert integer to string formatted to locale."""
