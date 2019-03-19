@@ -51,7 +51,7 @@ from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
 from ..bolt import deprint, sio, struct_pack, \
     struct_unpack
-from ..bolt_module.collect import DataDict, LowerDict
+from ..bolt_module.collect import DataDict, LowerDict, Settings
 from ..bolt_module.paths import GPath, Path
 from ..bolt_module.unicode_utils import decode
 from ..brec import MreRecord, ModReader
@@ -3127,7 +3127,7 @@ def initSettings(readOnly=False, _dat=u'BashSettings.dat',
 
     def _load(dat_file=_dat):
     # bolt.PickleDict.load() handles EOFError, ValueError falling back to bak
-        return bolt.Settings( # calls PickleDict.load() and copies loaded data
+        return Settings( # calls PickleDict.load() and copies loaded data
             bolt.PickleDict(dirs['saveBase'].join(dat_file), readOnly))
 
     _dat = dirs['saveBase'].join(_dat)
