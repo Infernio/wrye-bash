@@ -30,10 +30,8 @@ import sys
 from .. import bolt, archives, bass
 from ..archives import defaultExt, readExts, compressionSettings, \
     compressCommand
-from ..bolt import PickleDict, sio
-from ..bolt_module.collect import DataDict
-from ..bolt_module.output import SubProgress, Progress
-from ..bolt_module.paths import GPath, Path
+from ..bolt import DataDict, GPath, Path, PickleDict, Progress, sio, \
+    SubProgress
 from ..exception import ArgumentError, StateError
 
 converters_dir = None

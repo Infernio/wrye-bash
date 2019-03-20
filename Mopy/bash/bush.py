@@ -31,8 +31,7 @@ import collections
 import struct
 import game as game_init
 from bass import get_ini_option
-from bolt_module.debugging import deprint
-from bolt_module.paths import GPath, Path
+from bolt import deprint, GPath, Path
 from env import get_registry_game_path
 from exception import BoltError
 

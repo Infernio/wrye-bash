@@ -44,10 +44,8 @@ from .. import bass, bolt, bosh, bush, balt, archives
 from ..balt import EnabledLink, CheckLink, AppendableLink, OneItemLink, \
     UIList_Rename, UIList_Hide
 from ..belt import InstallerWizard, generateTweakLines
-from ..bolt import formatInteger, round_size
-from ..bolt_module.debugging import deprint
-from ..bolt_module.output import LogFile, SubProgress
-from ..bolt_module.paths import GPath
+from ..bolt import deprint, formatInteger, GPath, output, round_size, \
+    SubProgress
 from ..exception import CancelError, SkipError, StateError
 
 __all__ = ['Installer_Open', 'Installer_Duplicate', 'InstallerOpenAt_MainMenu',
@@ -116,7 +114,7 @@ class _InstallerLink(Installers_Link, EnabledLink):
         self.window.RefreshUI(detail_item=archive_path)
 
     def _askFilename(self, message, filename):
-        """:rtype: bolt_module.paths.Path"""
+        """:rtype: bolt.Path"""
         result = self._askText(message, title=self.dialogTitle,
                                default=filename)
         if not result: return
@@ -1237,7 +1235,7 @@ class InstallerConverter_Create(_InstallerConverter_Link):
             #--Refresh UI
             self.idata.irefresh(what='C')
             #--Generate log
-            log = LogFile(StringIO.StringIO())
+            log = output.LogFile(StringIO.StringIO())
             log.setHeader(u'== '+_(u'Overview')+u'\n')
 ##            log('{{CSS:wtxt_sand_small.css}}')
             log(u'. '+_(u'Name')+u': '+BCFArchive.s)

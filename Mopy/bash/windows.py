@@ -27,9 +27,9 @@
 #       MA 02110-1301, USA.
 #
 import subprocess
-
 from ctypes import *
-from bolt_module.debugging import deprint
+
+from bolt import deprint
 
 try:
     from ctypes.wintypes import MAX_PATH

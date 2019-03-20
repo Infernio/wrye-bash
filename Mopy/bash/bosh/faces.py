@@ -23,9 +23,7 @@
 # =============================================================================
 import re
 from .. import bass, bush, bolt
-from ..bolt import Flags, sio, struct_pack, struct_unpack
-from ..bolt_module.paths import Path
-from ..bolt_module.unicode_utils import encode
+from ..bolt import encode, Flags, Path, sio, struct_pack, struct_unpack
 from ..exception import SaveFileError, StateError
 from . import SaveInfo
 from ._saves import SreNPC, SaveFile

@@ -37,12 +37,8 @@ import bosh # for modInfos
 import env
 import load_order
 from balt import Progress
-from bolt import CsvReader, csvFormat, struct_pack, struct_unpack
-from bolt_module import output
-from bolt_module.debugging import deprint
-from bolt_module.output import SubProgress
-from bolt_module.paths import GPath
-from bolt_module.unicode_utils import decode
+from bolt import CsvReader, csvFormat, decode, deprint, GPath, output, \
+    struct_pack, struct_unpack, SubProgress
 from bass import dirs, inisettings
 from brec import MreRecord, MelObject, _coerce, genFid, ModReader, ModWriter, \
     RecordHeader

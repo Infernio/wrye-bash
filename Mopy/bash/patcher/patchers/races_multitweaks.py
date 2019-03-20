@@ -35,9 +35,7 @@ from collections import defaultdict
 # Internal
 from ... import bush # for defaultEyes (?)
 from ... import bosh # for modInfos
-from ...bolt_module.debugging import deprint
-from ...bolt_module.output import SubProgress
-from ...bolt_module.paths import GPath
+from ...bolt import deprint, GPath, SubProgress
 from ...brec import MreRecord, MelObject, strFid
 from ...cint import ValidateDict, FormID
 from ...exception import BoltError

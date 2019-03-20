@@ -39,10 +39,7 @@ from .. import bass, bosh, bolt, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, TextCtrl, toggleButton, vSizer, hspacer, \
     StaticText, CheckLink, EnabledLink, AppendableLink, TransLink, RadioLink, \
     SeparatorLink, ChoiceLink, OneItemLink, Image, ListBoxes, OkButton
-from ..bolt import formatDate
-from ..bolt_module import paths, output
-from ..bolt_module.output import LogFile, SubProgress
-from ..bolt_module.paths import GPath
+from ..bolt import formatDate, GPath, paths, output, SubProgress
 from ..bosh import faces
 from ..cint import CBashApi, FormID
 from ..exception import AbstractError, BoltError, CancelError
@@ -710,7 +707,7 @@ class Mod_ListDependent(OneItemLink):
         merged_, imported_ = modInfos.merged, modInfos.imported
         head, bul = u'=== ', u'* '
         with bolt.sio() as out:
-            log = LogFile(out)
+            log = output.LogFile(out)
             log(u'[spoiler][xml]')
             log.setHeader(head + self.legend + u': ')
             loOrder =  lambda tup: load_order.cached_lo_index_or_max(tup[0])
@@ -1112,7 +1109,7 @@ class Mod_ListPatchConfig(_Mod_BP_Link):
         patchers.sort(key=lambda a: a.__class__.name)
         patchers.sort(key=lambda a: groupOrder[a.__class__.group])
         #--Log & Clipboard text
-        log = LogFile(StringIO.StringIO())
+        log = output.LogFile(StringIO.StringIO())
         log.setHeader(u'= %s %s' % (self._selected_item, _(u'Config')))
         log(_(u'This is the current configuration of this Bashed Patch.  This report has also been copied into your clipboard.')+u'\n')
         clip = StringIO.StringIO()
@@ -1238,7 +1235,7 @@ class Mod_ScanDirty(ItemLink):
                 ret = bosh.mods_metadata.ModCleaner.scan_Many(modInfos, progress=progress, detailed=True)
         except CancelError:
             return
-        log = LogFile(StringIO.StringIO())
+        log = output.LogFile(StringIO.StringIO())
         log.setHeader(u'= '+_(u'Scan Mods'))
         log(_(u'This is a report of records that were detected as either Identical To Master (ITM) or a deleted reference (UDR).')
             + u'\n')
@@ -1402,7 +1399,7 @@ class Mod_UndeleteRefs(EnabledLink):
         with balt.Progress(self._text) as progress:
             progress.setFull(len(self.selected))
             hasFixed = False
-            log = LogFile(StringIO.StringIO())
+            log = output.LogFile(StringIO.StringIO())
             for index,(fileName,fileInfo) in enumerate(self.iselected_pairs()):
                 if bosh.reOblivion.match(fileName.s):
                     self._showWarning(_(u'Skipping') + u' ' + fileName.s,
@@ -2595,7 +2592,7 @@ class Mod_ItemData_Import(_Mod_Import_Link): # CRUFT
             self._showLog(buff.getvalue())
 
 #------------------------------------------------------------------------------
-from ..bolt_module.debugging import deprint
+from ..bolt import deprint
 from ..cint import ObCollection
 
 class MasterList_AddMasters(ItemLink): # CRUFT

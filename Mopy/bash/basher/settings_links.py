@@ -31,9 +31,7 @@ from .dialogs import ColorDialog
 from .. import barb, bush, balt, bass, env, exception
 from ..balt import ItemLink, AppendableLink, RadioLink, CheckLink, MenuLink, \
     TransLink, EnabledLink, BoolLink, tooltip, Link
-from ..bolt_module import debugging, localization, unicode_utils
-from ..bolt_module.debugging import deprint
-from ..bolt_module.paths import GPath
+from ..bolt import debugging, deprint, GPath, localization, unicode_utils
 from ..exception import BoltError
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 

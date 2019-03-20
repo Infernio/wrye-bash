@@ -27,11 +27,9 @@ import subprocess
 from subprocess import PIPE
 
 from .. import env, bass, archives
-from ..bolt import startupinfo, unpack_int_signed, unpack_byte, unpack_short, \
-    unpack_int64_signed, struct_pack
-from ..bolt_module.output import Progress, SubProgress
-from ..bolt_module.paths import Path
-from ..bolt_module.unicode_utils import decode, encode
+from ..bolt import decode, encode, Path, Progress, startupinfo, struct_pack, \
+    SubProgress, unpack_int_signed, unpack_byte, unpack_short, \
+    unpack_int64_signed
 
 def _readNetString(open_file):
     """Read a .net string. THIS CODE IS DUBIOUS!"""

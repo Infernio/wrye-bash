@@ -30,7 +30,7 @@ from .. import bosh, balt, bass, load_order
 from .. import bush # for Mods_LoadListData, Mods_LoadList
 from ..balt import ItemLink, CheckLink, BoolLink, EnabledLink, ChoiceLink, \
     SeparatorLink, Link
-from ..bolt_module.paths import GPath
+from ..bolt import GPath
 from .. import exception
 
 __all__ = ['Mods_EsmsFirst', 'Mods_LoadList', 'Mods_SelectedFirst',

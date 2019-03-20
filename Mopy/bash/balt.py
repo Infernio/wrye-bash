@@ -29,11 +29,7 @@ import bass # for dirs - try to avoid
 #--Localization
 #..Handled by bolt, so import that.
 import bolt
-from bolt_module import output
-from bolt_module.collect import Settings
-from bolt_module.debugging import deprint
-from bolt_module.paths import GPath, Path
-from bolt_module.output import WryeText
+from bolt import deprint, GPath, output, Path, WryeText
 from exception import AbstractError, AccessDeniedError, ArgumentError, \
     BoltError, CancelError, SkipError, StateError
 #--Python
@@ -80,7 +76,7 @@ class Font(wx.Font):
         return font_
 
 # Settings --------------------------------------------------------------------
-__unset = Settings(dictFile=None) # type information
+__unset = bolt.collect.Settings(dictFile=None) # type information
 _settings = __unset # must be bound to bosh.settings - smelly, see #174
 sizes = {} #--Using applications should override this.
 

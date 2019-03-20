@@ -26,8 +26,7 @@
 to the Gmst Multitweaker - as well as the GmstTweaker itself. Gmst stands
 for game settings."""
 from ... import bush # for game
-from ...bolt_module.debugging import deprint
-from ...bolt_module.output import SubProgress
+from ...bolt import deprint, SubProgress
 from ...brec import MreRecord, ModReader
 from ...exception import StateError
 from ...patcher.patchers.base import MultiTweakItem, CBash_MultiTweakItem

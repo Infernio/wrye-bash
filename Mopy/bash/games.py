@@ -35,9 +35,7 @@ from collections import defaultdict
 # Local
 import bass
 import bolt
-from bolt_module import unicode_utils
-from bolt_module.debugging import deprint
-from bolt_module.paths import GPath, Path
+from bolt import deprint, GPath, Path, unicode_utils
 import env
 import exception
 

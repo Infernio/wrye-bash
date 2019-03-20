@@ -29,10 +29,8 @@ from collections import OrderedDict, Counter
 from . import AFile
 from .. import env, bush, balt
 from ..bass import dirs
-from ..bolt_module.collect import CIstr, LowerDict, DefaultLowerDict
-from ..bolt_module.debugging import deprint
-from ..bolt_module.paths import GPath
-from ..bolt_module.unicode_utils import getbestencoding, decode
+from ..bolt import CIstr, collect, decode, deprint, GPath, LowerDict, \
+    unicode_utils
 from ..exception import AbstractError, CancelError, SkipError, BoltError
 
 def _to_lower(ini_settings): # transform dict of dict to LowerDict of LowerDict
@@ -48,7 +46,7 @@ def get_ini_type_and_encoding(abs_ini_path):
     reportedly must be cp1252). More investigation needed."""
     with open(u'%s' % abs_ini_path, 'rb') as ini_file:
         content = ini_file.read()
-    detected_encoding, _confidence = getbestencoding(content)
+    detected_encoding, _confidence = unicode_utils.getbestencoding(content)
     decoded_content = decode(content, detected_encoding)
     count = Counter()
     for line in decoded_content.splitlines():
@@ -137,8 +135,8 @@ class IniFile(AFile):
         :rtype: tuple(DefaultLowerDict[bolt.LowerDict], DefaultLowerDict[
         bolt.LowerDict], boolean)
         """
-        ci_settings = DefaultLowerDict(LowerDict)
-        ci_deleted_settings = DefaultLowerDict(LowerDict)
+        ci_settings = collect.DefaultLowerDict(LowerDict)
+        ci_deleted_settings = collect.DefaultLowerDict(LowerDict)
         default_section = self.__class__.defaultSection
         isCorrupted = u''
         reComment = self.__class__.reComment
@@ -331,8 +329,8 @@ class IniFile(AFile):
         reSection = self.reSection
         reSetting = self.reSetting
         #--Read Tweak file
-        ini_settings = DefaultLowerDict(LowerDict)
-        deleted_settings = DefaultLowerDict(set)
+        ini_settings = collect.DefaultLowerDict(LowerDict)
+        deleted_settings = collect.DefaultLowerDict(set)
         section = None
         for line in tweak_lines:
             maDeleted = reDeleted.match(line)
@@ -428,8 +426,8 @@ class OBSEIniFile(IniFile):
     @classmethod
     def _get_ci_settings(cls, tweakPath):
         """Get the settings in the ini script."""
-        ini_settings = DefaultLowerDict(LowerDict)
-        deleted_settings = DefaultLowerDict(LowerDict)
+        ini_settings = collect.DefaultLowerDict(LowerDict)
+        deleted_settings = collect.DefaultLowerDict(LowerDict)
         reDeleted = cls.reDeleted
         reComment = cls.reComment
         with tweakPath.open('r') as iniFile:
@@ -536,8 +534,8 @@ class OBSEIniFile(IniFile):
     def applyTweakFile(self, tweak_lines):
         reDeleted = self.reDeleted
         reComment = self.reComment
-        ini_settings = DefaultLowerDict(LowerDict)
-        deleted_settings = DefaultLowerDict(LowerDict)
+        ini_settings = collect.DefaultLowerDict(LowerDict)
+        deleted_settings = collect.DefaultLowerDict(LowerDict)
         for line in tweak_lines:
             # Check for deleted lines
             maDeleted = reDeleted.match(line)

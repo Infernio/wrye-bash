@@ -35,14 +35,10 @@ import StringIO
 import struct
 from collections import OrderedDict
 from functools import partial
-from ..bolt import cstrip, unpack_string, unpack_int, unpack_str8, \
-    unpack_short, unpack_float, unpack_str16, unpack_byte, struct_pack, \
-    struct_unpack, unpack_int_delim, unpack_str16_delim, unpack_byte_delim, \
-    unpack_many
-from ..bolt_module import unicode_utils
-from ..bolt_module.debugging import deprint
-from ..bolt_module.paths import GPath
-from ..bolt_module.unicode_utils import decode
+from ..bolt import cstrip, decode, deprint, GPath, unpack_string, unpack_int, \
+    unpack_str8, unpack_short, unpack_float, unpack_str16, unpack_byte, \
+    struct_pack, struct_unpack, unicode_utils, unpack_int_delim, \
+    unpack_str16_delim, unpack_byte_delim, unpack_many
 from ..exception import SaveHeaderError, raise_bolt_error
 
 class SaveFileHeader(object):

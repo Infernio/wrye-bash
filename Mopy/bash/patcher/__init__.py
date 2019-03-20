@@ -24,7 +24,7 @@
 from collections import namedtuple
 
 from .. import balt, bolt, bass
-from ..bolt_module.paths import GPath
+from ..bolt import GPath
 
 PatcherInfo = namedtuple('PatcherInfo', ['clazz', 'twinPatcher'])
 

@@ -30,8 +30,7 @@ from .. import bass, balt, bosh, load_order
 from ..balt import TextCtrl, StaticText, vSizer, hSizer, hspacer, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, hspace, \
     vspace, BaltFrame, Resources, HtmlCtrl
-from ..bolt_module.paths import GPath, Path
-from ..bolt_module.output import WryeText
+from ..bolt import GPath, Path, WryeText
 from ..bosh import omods
 from ..exception import BoltError
 

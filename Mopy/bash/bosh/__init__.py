@@ -49,12 +49,8 @@ from .. import bass, bolt, balt, bush, env, load_order, archives, \
 from .. import patcher # for configIsCBash()
 from ..archives import readExts
 from ..bass import dirs, inisettings, tooldirs
-from ..bolt import sio, struct_pack, struct_unpack
-from ..bolt_module.collect import DataDict, LowerDict, Settings
-from ..bolt_module.debugging import deprint
-from ..bolt_module.output import LogFile
-from ..bolt_module.paths import GPath, Path
-from ..bolt_module.unicode_utils import decode
+from ..bolt import collect, DataDict, decode, deprint, GPath, LowerDict, \
+    output, Path, sio, struct_pack, struct_unpack
 from ..brec import MreRecord, ModReader
 from ..cint import CBashApi
 from ..exception import AbstractError, ArgumentError, BoltError, BSAError, \
@@ -960,7 +956,7 @@ class INIInfo(IniFile):
         if len(errors) == 1:
             errors.append(u' None')
         with sio() as out:
-            log = LogFile(out)
+            log = output.LogFile(out)
             for line in errors:
                 log(line)
             return bolt.winNewLines(log.out.getvalue())
@@ -2080,7 +2076,7 @@ class ModInfos(FileInfos):
         for its masters. Otherwise will show currently loaded mods."""
         #--Setup
         with sio() as out:
-            log = LogFile(out)
+            log = output.LogFile(out)
             head,bul,sMissing,sDelinquent,sImported = (
                 u'=== ',
                 u'* ',
@@ -3128,7 +3124,7 @@ def initSettings(readOnly=False, _dat=u'BashSettings.dat',
 
     def _load(dat_file=_dat):
     # bolt.PickleDict.load() handles EOFError, ValueError falling back to bak
-        return Settings( # calls PickleDict.load() and copies loaded data
+        return collect.Settings( # calls PickleDict.load() and copies loaded data
             bolt.PickleDict(dirs['saveBase'].join(dat_file), readOnly))
 
     _dat = dirs['saveBase'].join(_dat)

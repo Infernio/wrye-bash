@@ -29,7 +29,7 @@ from .frames import ModChecker, DocBrowser
 from .. import bass, bosh, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, Links, bitmapButton, \
     SeparatorLink, tooltip, BoolLink, staticBitmap
-from ..bolt_module.paths import GPath, Path
+from ..bolt import GPath, Path
 from ..exception import AbstractError
 from ..env import getJava
 

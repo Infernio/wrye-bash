@@ -32,9 +32,7 @@ from ScriptParser import error
 import wx
 import wx.wizard as wiz     # wxPython wizard class
 import bosh, balt, bush
-from bolt_module import output
-from bolt_module.paths import GPath
-from bolt_module.collect import LowerDict
+from bolt import GPath, LowerDict, output
 from balt import vspace, hspace
 from env import get_file_version
 import StringIO

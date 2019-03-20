@@ -39,17 +39,15 @@ from functools import partial
 # Internal
 import bass
 import exception
-from bolt_module.collect import DataDict, MainFunctions
-from bolt_module.debugging import deprint
-from bolt_module.localization import initTranslator
-from bolt_module.paths import GPath
-from bolt_module.output import WryeText, Progress, SubProgress
-from bolt_module.unicode_utils import decode
-
-# Needed for pickle backwards compatibility - these ARE used
-# TODO(inf) Once we drop backwards compatibility with older settings, we could
-# drop these imports too
-from bolt_module.collect import CIstr, LowerDict
+# Note: CIstr and LowerDict are needed for pickle backwards compatibility
+from .collect import CIstr, DataDict, LowerDict, MainFunctions
+from .debugging import deprint
+from .localization import initTranslator
+# Path is not needed in this file, but is included for convenient importing
+from .paths import GPath, Path
+from .output import Progress, SubProgress, WryeText
+# Same goes for encode - not needed, only here for convenience
+from .unicode_utils import decode, encode
 
 # structure aliases, mainly introduced to reduce uses of 'pack' and 'unpack'
 

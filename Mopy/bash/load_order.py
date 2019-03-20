@@ -48,8 +48,7 @@ import time
 import balt
 import bass
 import bolt
-from bolt_module.debugging import deprint
-from bolt_module.paths import Path
+from bolt import deprint, Path
 import bush
 import exception
 # Game instance providing load order operations API

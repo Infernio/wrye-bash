@@ -26,6 +26,8 @@ reading / writing text from / to sources with an unknown encoding (e.g. plugin
 files, cosaves, etc.)."""
 import os
 import chardet
+# No local imports here! Used in so many places that any local imports will
+# almost surely make a circular dependency.
 
 #--decode unicode strings
 #  This is only useful when reading fields from mods, as the encoding is not

@@ -44,10 +44,9 @@ from os.path import join as jo
 import archives
 import bass # for settings (duh!)
 import bolt
+from bolt import deprint, GPath, Path
 import initialization
 from bass import dirs, AppVersion
-from bolt_module.debugging import deprint
-from bolt_module.paths import GPath, Path
 from exception import BoltError, StateError, raise_bolt_error
 
 def _init_settings_files(fsName_):

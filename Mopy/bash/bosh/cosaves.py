@@ -27,11 +27,9 @@ read them to log stats and write them to remap espm masters. We only handle
 renaming of the masters of the xSE plugin chunk itself and of the Pluggy chunk.
 """
 
-from ..bolt import sio, unpack_string, unpack_int, \
+from ..bolt import decode, encode, GPath, sio, unpack_string, unpack_int, \
     unpack_short, unpack_4s, unpack_byte, unpack_str16, struct_pack, \
     struct_unpack
-from ..bolt_module.paths import GPath
-from ..bolt_module.unicode_utils import decode, encode
 from ..exception import FileError
 
 class CoSaveHeader(object):
@@ -63,7 +61,7 @@ class _Chunk(object):
         """
         :param save_masters: the espm masters of the save, used in xSE chunks
         :param espmMap: a dict populated in pluggy chunks
-        :type log: bolt_module.output.Log
+        :type log: bolt.output.Log
         """
 
     def chunk_map_master(self, master_renames_dict, plugin_chunk):

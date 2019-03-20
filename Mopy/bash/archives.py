@@ -26,9 +26,7 @@ import re
 import subprocess
 
 import bass
-from bolt import startupinfo, walkdir
-from bolt_module.debugging import deprint
-from bolt_module.paths import GPath
+from bolt import deprint, GPath, startupinfo, walkdir
 from exception import StateError
 
 exe7z = u'7z.exe' if os.name == u'nt' else u'7z'

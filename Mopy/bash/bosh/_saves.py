@@ -29,12 +29,9 @@ from itertools import starmap, repeat
 from operator import attrgetter
 
 from .. import bush
-from ..bolt import Flags, sio, cstrip, unpack_byte, unpack_str8, \
-    unpack_many, unpack_int, unpack_short, struct_pack, struct_unpack
-from ..bolt_module.debugging import deprint
-from ..bolt_module.output import Log, Progress, SubProgress
-from ..bolt_module.paths import GPath
-from ..bolt_module.unicode_utils import decode, encode
+from ..bolt import cstrip, decode, deprint, encode, Flags, GPath, output, \
+    Progress, sio, struct_pack, struct_unpack, SubProgress, unpack_byte, \
+    unpack_str8, unpack_many, unpack_int, unpack_short
 from ..brec import ModReader, MreRecord, ModWriter, getObjectIndex, \
     getFormIndices
 from ..exception import FileError, ModError, StateError
@@ -593,7 +590,7 @@ class SaveFile:
     #--------------------------------------------------------------------------
     def logStats(self,log=None):
         """Print stats to log."""
-        log = log or Log()
+        log = log or output.Log()
         doLostChanges = False
         doUnknownTypes = False
         def getMaster(modIndex):

@@ -31,8 +31,7 @@ from operator import attrgetter
 from ... import bosh # for modInfos
 from ... import load_order
 from ...bush import game, game_mod # for Name patcher
-from ...bolt_module.collect import MemorySet
-from ...bolt_module.paths import GPath
+from ...bolt import collect, GPath
 from ...brec import MreRecord, MelObject
 from ...cint import ValidateDict, ValidateList, FormID, validTypes, \
     getattr_deep, setattr_deep
@@ -1225,7 +1224,7 @@ class CBash_NPCAIPackagePatcher(CBash_ImportPatcher, _ANPCAIPackagePatcher):
             return
 
         recordId = record.fid
-        newPackages = MemorySet(aiPackages)
+        newPackages = collect.MemorySet(aiPackages)
         self.previousPackages.setdefault(recordId, {})[
             modFile.GName] = newPackages
 
@@ -1249,7 +1248,7 @@ class CBash_NPCAIPackagePatcher(CBash_ImportPatcher, _ANPCAIPackagePatcher):
                 # Get differences from master
                 added = newPackages - masterPackages
                 sameButReordered = masterPackages & newPackages
-                prevDeleted = MemorySet(mergedPackages.discarded)
+                prevDeleted = collect.MemorySet(mergedPackages.discarded)
                 newDeleted = masterPackages - newPackages
 
                 # Merge those changes into mergedPackages

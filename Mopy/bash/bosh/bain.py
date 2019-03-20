@@ -42,12 +42,8 @@ from .. import balt # YAK!
 from .. import bush, bass, bolt, env, archives
 from ..archives import readExts, defaultExt, list_archive, compress7z, \
     extract7z, compressionSettings
-from ..bolt import formatInteger, round_size, sio
-from ..bolt_module import output
-from ..bolt_module.collect import CIstr, DefaultLowerDict, LowerDict
-from ..bolt_module.debugging import deprint
-from ..bolt_module.output import LogFile, SubProgress
-from ..bolt_module.paths import GPath, Path
+from ..bolt import CIstr, collect, deprint, GPath, formatInteger, LowerDict, \
+    output, round_size, sio, SubProgress, Path
 from ..exception import AbstractError, ArgumentError, BSAError, CancelError, \
     InstallerArchiveError, SkipError, StateError, FileError
 
@@ -201,7 +197,7 @@ class Installer(object):
         self.ci_dest_sizeCrc = LowerDict()
         self.hasWizard = False
         self.hasBCF = False
-        self.espmMap = DefaultLowerDict(list)
+        self.espmMap = collect.DefaultLowerDict(list)
         self.hasReadme = False
         self.hasBethFiles = False
         self.skipExtFiles = set()
@@ -646,7 +642,7 @@ class Installer(object):
         skipDirFilesDiscard = skipDirFiles.discard
         skipExtFilesAdd = self.skipExtFiles.add
         commonlyEditedExts = Installer.commonlyEditedExts
-        espmMap = self.espmMap = DefaultLowerDict(list)
+        espmMap = self.espmMap = collect.DefaultLowerDict(list)
         reModExtMatch = ModInfos.file_pattern.match
         reReadMeMatch = Installer.reReadMe.match
         #--Scan over fileSizeCrcs
@@ -1052,7 +1048,7 @@ class Installer(object):
     def listSource(self):
         """Return package structure as text."""
         with sio() as out:
-            log = LogFile(out)
+            log = output.LogFile(out)
             log.setHeader(u'%s ' % self.archive + _(u'Package Structure:'))
             log(u'[spoiler][xml]\n', False)
             apath = bass.dirs['installers'].join(self.archive)
@@ -2680,7 +2676,7 @@ class InstallersData(DataStore):
         """Returns package list as text."""
         #--Setup
         with sio() as out:
-            log = LogFile(out)
+            log = output.LogFile(out)
             log.setHeader(_(u'Bain Packages:'))
             #--List
             log(u'[spoiler][xml]\n',False)

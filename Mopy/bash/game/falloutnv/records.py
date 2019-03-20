@@ -28,8 +28,7 @@ import struct
 from ..fallout3.records import MelScrxen, MelOwnership, MelDestructible, \
     MelBipedFlags, MelEffects, MelConditions, MreHasEffects
 from ...bass import null1, null2, null3, null4
-from ...bolt import Flags
-from bolt_module.paths import GPath
+from ...bolt import Flags, GPath
 from ...brec import MelModel # set in Mopy/bash/game/fallout3/records.py
 from ...brec import MelRecord, MelStructs, MelGroups, MelStruct, FID, \
     MelGroup, MelString, MelSet, MelFid, MelNull, MelOptStruct, MelFids, \
