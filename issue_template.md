@@ -1,65 +1,54 @@
-Please see [here](https://github.com/wrye-bash/wrye-bash/wiki/[github]-Reporting-a-bug)
-for guidelines on reporting issues. In particular, you must provide the info/steps below:
+<!-- Please see https://github.com/wrye-bash/wrye-bash/wiki/[github]-Reporting-a-bug
+for guidelines on reporting issues. In particular, you must provide the
+info/steps below. Check the checkboxes by replacing [ ] with [x] and fill out
+the text boxes as you follow the instructions. -->
 
-### Link to the forum thread you reported the issue
+### Latest Nightly
 
-**IMPORTANT**: Before posting an issue, be sure to ask at the official thread on
-[AFK Mods](https://afkmods.com/index.php?/topic/4966-wrye-bash-all-games/&do=getNewComment)
-(or on [Discord](https://discord.gg/NwWvAFR)).
+<!-- Download the nightly/WIP build from the second post in the AFKMods thread
+or from the #wip-builds channel on Discord. If the issue no longer occurs
+with this build, *do not report it!*. That means we have are aware of it and
+have already fixed it. The next stable release will have the fix. -->
 
-**POST AN ISSUE ON GITHUB _ONLY_ AFTER DOING SO**.
+- [ ] I have tried the latest nightly build and the issue still occurs.
 
-Add the link to your post here:
+### Asking on Discord/AFKMods
 
-### Try the latest nightly build:
+<!-- IMPORTANT: Before posting an issue, be sure to ask at the official thread
+on AFK Mods (https://afkmods.com/index.php?/topic/4966-wrye-bash-all-games/&do=getNewComment)
+or on Discord (https://discord.gg/NwWvAFR).
 
-Download from the [second post in AFK mods thread](https://afkmods.com/index.php?/topic/4966-wrye-bash-all-games/&do=findComment&comment=166863)
+Post an issue on GitHub only *after* doing so! This way we avoid tons of
+duplicate issues for problems that we are already aware of/working on
+fixing. -->
 
-### Info on your installation
+- [ ] I have asked on Discord/AFKMods and gotten the go-ahead to post this issue.
 
-* You must produce a bashbugdump.log and include its contents in the codebox below
+### BashBugDump
 
-    ```
-    Contents of the bashbugdump
-    ```
+<!-- You must produce a bashbugdump.log and include its contents in the text
+box below. See https://github.com/wrye-bash/wrye-bash/wiki/[github]-Reporting-a-bug#the-bashbugdumplog
+for instructions on how to generate this file. -->
 
-    See [here](https://github.com/wrye-bash/wrye-bash/wiki/[github]-Reporting-a-bug#the-bashbugdumplog)
-for generating the bugdump
+```
+REPLACE THIS TEXT WITH THE CONTENTS OF THE BashBugDump.log
+```
 
-* **Your operating system!** If on Windows Vista or later and the game is in
-the default directory (ex: *C:\Program Files (x86)\Bethesda Softworks\Oblivion*),
-please install it somewhere else (like *C:\Games\Oblivion*). This can cause
-lots of problems, due to UAC (User Account Control).
+### Details of the Issue
 
-* **Wrye Bash version!** _Also_ specify if you are using Python Wrye Bash, or
-Standalone Wrye Bash exe ( WBSA ). If you're using a development version, be
-sure to include the *commit SHA*.
+#### Description
+Replace this section with a description of the issue. Describe what you wanted
+the program to do and what it did instead.
 
-#### Are you using a **bash.ini** ?
-
-* If so, include its contents in the codebox below, or if too big attach it to this issue
-
-    ```
-    Contents of the bash.ini
-    ```
-
-### Info on the bug
-
-* **Bug description** - be sure to include:
-  * what you did (_**step-by-step**_),
-  * what you expected, and
-  * what happened.
-
-  If your problem is related to a particular mod, link us to it adding the
-  exact version we should download
-* Any and every **error message** you encounter - post at least the contents
-of any `stdout/stderr` window that pops up with errors (python tracebacks).
-
-* Is the problem related to the **Bashed Patch** ? If so include the following:
-  * Your Load Order (attach a txt). Right click on a column header in the Mods tab > 'List Mods...'.
-  * Your Bashed Tags (attach a txt). Right click on a column header in the Mods tab > 'List Bash Tags...'.
-  * Your Bashed Patch config (attach a txt). Right click on the Bashed patch in the Mods tab > 'List Patch Config...'.
-
-  Be sure to supply the **minimal load order and patch options that reproduce
-  your bug.** That is, deselect all batch patch options and deactivate all the
-  mods, then try to pin down which options and which mods trigger the bug.
+#### Step-by-step reproduction
+1. Include a step-by-step process to reproduce the issue here
+1. Use lines starting with '1.', GitHub will automatically number them
+   correctly when you submit the issue
+1. If the steps require downloading mods, include links to them and the exact
+   versions we have to download here
+1. If the steps require activating certain Bashed Patch options, include
+   information on your BP settings and mod tags. You can do this on the Mods
+   tab as follows:
+     * Your Load Order: 'View' > 'List Mods...'
+     * Your Bashed Tags: 'View' > 'List Bash Tags...'
+     * Your Bashed Patch config: Right click on the Bashed Patch > 'List Patch Config...'
